@@ -5,9 +5,23 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
@@ -16,5 +30,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 1337
           script: |
-            cd /var/www/admin.postalwiki.co.uk
-            ./deploy.sh
+            # Create backup of current build
+            if [ -d "/var/www/admin.postalwiki.co.uk/dist" ]; then
+              mv /var/www/admin.postalwiki.co.uk/dist /var/www/admin.postalwiki.co.uk/dist_backup_$(date +%Y%m%d_%H%M%S)
+            fi
+            # Create dist directory if it doesn't exist
+            mkdir -p /var/www/admin.postalwiki.co.uk/dist
+          source: dist/
+          target: /var/www/admin.postalwiki.co.uk/dist
+          strip_components: 0
