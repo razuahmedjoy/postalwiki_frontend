@@ -37,7 +37,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 1337
           source: "dist/"
-          target: "/var/www/admin.postalwiki.co.uk"
+          target: "/home/lysnar/admin.postalwiki.co.uk"
           strip_components: 0
 
       - name: Verify deployment
@@ -49,11 +49,11 @@ jobs:
           port: 1337
           script: |
             echo "Contents of dist directory on server:"
-            ls -la /var/www/admin.postalwiki.co.uk/dist/
+            ls -la /home/lysnar/admin.postalwiki.co.uk/
             echo "Total files in dist:"
-            find /var/www/admin.postalwiki.co.uk/dist -type f | wc -l
+            find /home/lysnar/admin.postalwiki.co.uk/ -type f | wc -l
             echo "Setting permissions..."
-            chown -R devuser:nobody /var/www/admin.postalwiki.co.uk/dist
-            chmod -R 775 /var/www/admin.postalwiki.co.uk/dist
+            chown -R lysnar:nobody /home/lysnar/admin.postalwiki.co.uk
+            chmod -R 775 /home/lysnar/admin.postalwiki.co.uk
             echo "Restarting Apache..."
             sudo /usr/local/apache/bin/apachectl graceful
