@@ -36,11 +36,11 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 1337
-          source: "dist/"
+          source: "dist/*"
           target: "/home/lysnar/admin.postalwiki.co.uk"
           strip_components: 0
 
-      - name: Verify deployment
+      - name: Set permissions and restart Apache
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -48,12 +48,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 1337
           script: |
-            echo "Contents of dist directory on server:"
-            ls -la /home/lysnar/admin.postalwiki.co.uk/
-            echo "Total files in dist:"
-            find /home/lysnar/admin.postalwiki.co.uk/ -type f | wc -l
-            echo "Setting permissions..."
-            chown -R lysnar:nobody /home/lysnar/admin.postalwiki.co.uk
-            chmod -R 775 /home/lysnar/admin.postalwiki.co.uk
-            echo "Restarting Apache..."
+            # Set ownership of the directory
+            sudo chown -R lysnar:nobody /home/lysnar/admin.postalwiki.co.uk
+            # Set permissions
+            sudo chmod -R 775 /home/lysnar/admin.postalwiki.co.uk
+            # Restart Apache
             sudo /usr/local/apache/bin/apachectl graceful
