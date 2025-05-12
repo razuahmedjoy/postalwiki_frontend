@@ -8,6 +8,11 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react()
   ].filter(Boolean),
+  build: {
+    outDir: 'dist',
+    // Make sure .htaccess is copied to the build
+    copyPublicDir: true
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
