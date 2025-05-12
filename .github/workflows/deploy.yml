@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 1337
-          source: "dist/*"
+          source: "dist/."
           target: "/home/lysnar/admin.postalwiki.co.uk"
           strip_components: 0
 
