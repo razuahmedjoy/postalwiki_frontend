@@ -10,6 +10,7 @@ import { useMutation } from '@tanstack/react-query';
 import Papa from 'papaparse';
 import { Spinner } from '@/components/ui/spinner';
 import { useSSUrlCollections } from '@/api/ssUrl';
+import { axiosInstance } from '@/lib/axios';
 
 interface CSVRow {
     url: string;
@@ -46,19 +47,8 @@ const SSUrlImport: React.FC = () => {
     // Import mutation
     const importMutation = useMutation({
         mutationFn: async (data: { chunk: CSVRow[], bucketName: string }) => {
-            const response = await fetch('http://localhost:5000/api/ss-url/import', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return response.json();
+            const { data: responseData } = await axiosInstance.post('/ss-url/import', data);
+            return responseData;
         },
         onSuccess: (data) => {
             // Update stats

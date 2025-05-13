@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
 
 interface SSUrlCollection {
@@ -17,3 +17,6 @@ export const useSSUrlCollections = () => {
         gcTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes
     });
 }; 
+
+
+
