@@ -146,7 +146,7 @@ const SSUrlImport: React.FC = () => {
                 }
 
                 const data = results.data.filter(row => row.url && row.image);
-                const entriesPerChunk = 300;
+                const entriesPerChunk = 500;
                 const chunks: CSVRow[][] = [];
 
                 // Split into chunks
@@ -334,7 +334,7 @@ const SSUrlImport: React.FC = () => {
                         <Textarea
                             className="h-60 font-mono text-sm bg-muted resize-none"
                             readOnly
-                            value={errorLogs.join('\n')}
+                            value={errorLogs.map(log => log.replace(/<br>/g, '\n')).join('\n')}
                         />
                     </div>
                 </div>

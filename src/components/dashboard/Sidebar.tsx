@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -115,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-3 text-sidebar-foreground">
+      <nav className="flex-1 space-y-1 px-2 py-4">
         <div className="flex flex-col gap-1">
           {/* <SidebarItem
             to="/dashboard"
@@ -153,6 +152,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
             to="/dashboard/ss-url-import"
             icon={<Upload className="h-5 w-5" />}
             label="SS-URL Import"
+            onClick={handleItemClick}
+          />
+          <SidebarItem
+            to="/dashboard/mongodb-stats"
+            icon={<Database className="h-5 w-5" />}
+            label="Collection Stats"
             onClick={handleItemClick}
           />
           {/* <SidebarItem
