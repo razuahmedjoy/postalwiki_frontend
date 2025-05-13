@@ -136,7 +136,7 @@ const SSUrlImport: React.FC = () => {
                 }
 
                 const data = results.data.filter(row => row.url && row.image);
-                const entriesPerChunk = 500;
+                const entriesPerChunk = 300;
                 const chunks: CSVRow[][] = [];
 
                 // Split into chunks
