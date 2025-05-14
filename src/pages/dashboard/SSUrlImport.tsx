@@ -229,14 +229,12 @@ const SSUrlImport: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 p-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">SS-URL Import</h1>
-            </div>
+        <div className="space-y-6 p-4">
+      
 
-            <Card className="p-6 space-y-6">
+            <Card className="p-6 space-y-6 shadow-md">
                 <div>
-                    <h2 className="text-xl font-medium mb-4">Import CSV Data</h2>
+                    <h2 className="text-xl font-medium mb-4">SS URL Import CSV Data</h2>
                     <p className="text-muted-foreground mb-4">
                         Upload a CSV file with URL and image data to import into the database.
                         <br />
