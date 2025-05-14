@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,8 +33,23 @@ const SSUrlImport: React.FC = () => {
         notFound: 0
     });
     const logsEndRef = useRef<HTMLDivElement>(null);
+    const errorLogsEndRef = useRef<HTMLDivElement>(null);
+    const logsTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const errorLogsTextareaRef = useRef<HTMLTextAreaElement>(null);
 
+    // Auto-scroll effect for processing logs
+    useEffect(() => {
+        if (logsTextareaRef.current) {
+            logsTextareaRef.current.scrollTop = logsTextareaRef.current.scrollHeight;
+        }
+    }, [logs]);
 
+    // Auto-scroll effect for error logs
+    useEffect(() => {
+        if (errorLogsTextareaRef.current) {
+            errorLogsTextareaRef.current.scrollTop = errorLogsTextareaRef.current.scrollHeight;
+        }
+    }, [errorLogs]);
 
     const addLog = (message: string) => {
         setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -138,7 +153,7 @@ const SSUrlImport: React.FC = () => {
                 const data = results.data.filter(row => row.url && row.image);
                 const entriesPerChunk = 200;
                 const chunks: CSVRow[][] = [];
-                const CONCURRENT_CHUNKS = 5; // Number of chunks to process simultaneously
+                const CONCURRENT_CHUNKS = 10; // Number of chunks to process simultaneously
 
                 // Split into chunks
                 for (let i = 0; i < data.length; i += entriesPerChunk) {
@@ -261,6 +276,15 @@ const SSUrlImport: React.FC = () => {
                             {isUploading ? <Spinner /> : 'Upload and Process'}
 
                         </Button>
+
+                        {/* Add a notice about not to close the browser while processing or uploading */}
+                        {
+                            isUploading && (
+                                <div className="mt-4 text-sm text-red-500">
+                                    <p>Note: Do not close the browser while processing or uploading.</p>
+                                </div>
+                            )
+                        }
                     </div>
 
                     <div className="space-y-4">
@@ -311,6 +335,7 @@ const SSUrlImport: React.FC = () => {
                             Processing Logs
                         </h3>
                         <Textarea
+                            ref={logsTextareaRef}
                             className="h-60 font-mono text-sm bg-muted resize-none"
                             readOnly
                             value={logs.join('\n')}
@@ -324,10 +349,12 @@ const SSUrlImport: React.FC = () => {
                             Error Logs
                         </h3>
                         <Textarea
+                            ref={errorLogsTextareaRef}
                             className="h-60 font-mono text-sm bg-muted resize-none"
                             readOnly
                             value={errorLogs.map(log => log.replace(/<br>/g, '\n')).join('\n')}
                         />
+                        <div ref={errorLogsEndRef} />
                     </div>
                 </div>
             </Card>
