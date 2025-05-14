@@ -136,7 +136,7 @@ const SSUrlImport: React.FC = () => {
                 }
 
                 const data = results.data.filter(row => row.url && row.image);
-                const entriesPerChunk = 300;
+                const entriesPerChunk = 200;
                 const chunks: CSVRow[][] = [];
 
                 // Split into chunks
@@ -146,58 +146,43 @@ const SSUrlImport: React.FC = () => {
 
                 addLog(`Loaded ${chunks.length} chunks of up to ${entriesPerChunk} entries each.`);
 
-                // Process chunks
+                // Process chunks with delay between requests
                 let completedChunks = 0;
-                const promises = chunks.map(async (chunk, index) => {
+                const processChunkWithRetry = async (chunk: CSVRow[], index: number, retryCount = 0) => {
                     try {
                         addLog(`Processing chunk #${index + 1}...`);
                         const result = await importMutation.mutateAsync({ chunk, bucketName });
                         addLog(`Chunk #${index + 1} completed. Success: ${result.success}, Errors: ${result.errors}, Not Found: ${result.notfound}`);
+                        return result;
                     } catch (error) {
-                        addLog(`Chunk #${index + 1} failed. Retrying with smaller chunks...`);
-
-                        // Split failed chunk in half and retry
-                        if (chunk.length > 1) {
-                            const half = Math.ceil(chunk.length / 2);
-                            const firstHalf = chunk.slice(0, half);
-                            const secondHalf = chunk.slice(half);
-
-                            try {
-                                addLog(`Retrying first half of chunk #${index + 1}...`);
-                                await importMutation.mutateAsync({ chunk: firstHalf, bucketName });
-                            } catch (error) {
-                                addErrorLog(`First half of chunk #${index + 1} failed: ${error instanceof Error ? error.message : String(error)}`);
-                            }
-
-                            try {
-                                addLog(`Retrying second half of chunk #${index + 1}...`);
-                                await importMutation.mutateAsync({ chunk: secondHalf, bucketName });
-                            } catch (error) {
-                                addErrorLog(`Second half of chunk #${index + 1} failed: ${error instanceof Error ? error.message : String(error)}`);
-                            }
+                        if (retryCount < 2) {
+                            addLog(`Chunk #${index + 1} failed. Retrying (${retryCount + 1}/2)...`);
+                            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 2 seconds before retry
+                            return processChunkWithRetry(chunk, index, retryCount + 1);
                         } else {
-                            // Single row chunk failed
-                            addErrorLog(`Failed to process entry: ${JSON.stringify(chunk[0])}`);
+                            addErrorLog(`Chunk #${index + 1} failed after 2 retries: ${error instanceof Error ? error.message : String(error)}`);
+                            throw error;
                         }
-                    } finally {
+                    }
+                };
+
+                // Process chunks sequentially with delay
+                for (let i = 0; i < chunks.length; i++) {
+                    try {
+                        await processChunkWithRetry(chunks[i], i);
                         completedChunks++;
                         setProgress(Math.floor((completedChunks / chunks.length) * 100));
+                        
+                        // Add delay between chunks to prevent overwhelming the server
+                        if (i < chunks.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                    } catch (error) {
+                        addErrorLog(`Failed to process chunk #${i + 1}: ${error instanceof Error ? error.message : String(error)}`);
                     }
-                });
-
-                try {
-                    await Promise.all(promises);
-                    addLog('All chunks processed.');
-                } catch (error) {
-                    addErrorLog(`Import process error: ${error instanceof Error ? error.message : String(error)}`);
-                    toast({
-                        variant: "destructive",
-                        title: "Import failed",
-                        description: "Some chunks could not be processed. Check the error logs."
-                    });
-                } finally {
-                    setIsUploading(false);
                 }
+
+                addLog('All chunks processed.');
             },
             error: (error) => {
                 addErrorLog(`CSV parsing error: ${error.message}`);
