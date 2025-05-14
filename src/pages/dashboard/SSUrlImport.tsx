@@ -138,6 +138,7 @@ const SSUrlImport: React.FC = () => {
                 const data = results.data.filter(row => row.url && row.image);
                 const entriesPerChunk = 200;
                 const chunks: CSVRow[][] = [];
+                const CONCURRENT_CHUNKS = 5; // Number of chunks to process simultaneously
 
                 // Split into chunks
                 for (let i = 0; i < data.length; i += entriesPerChunk) {
@@ -157,7 +158,7 @@ const SSUrlImport: React.FC = () => {
                     } catch (error) {
                         if (retryCount < 2) {
                             addLog(`Chunk #${index + 1} failed. Retrying (${retryCount + 1}/2)...`);
-                            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 2 seconds before retry
+                            await new Promise(resolve => setTimeout(resolve, 1000));
                             return processChunkWithRetry(chunk, index, retryCount + 1);
                         } else {
                             addErrorLog(`Chunk #${index + 1} failed after 2 retries: ${error instanceof Error ? error.message : String(error)}`);
@@ -166,23 +167,39 @@ const SSUrlImport: React.FC = () => {
                     }
                 };
 
-                // Process chunks sequentially with delay
-                for (let i = 0; i < chunks.length; i++) {
-                    try {
-                        await processChunkWithRetry(chunks[i], i);
-                        completedChunks++;
-                        setProgress(Math.floor((completedChunks / chunks.length) * 100));
-                        
-                        // Add delay between chunks to prevent overwhelming the server
-                        if (i < chunks.length - 1) {
-                            await new Promise(resolve => setTimeout(resolve, 500));
+                // Process chunks in parallel with concurrency limit
+                const processChunksInParallel = async () => {
+                    const processChunk = async (index: number) => {
+                        try {
+                            await processChunkWithRetry(chunks[index], index);
+                            completedChunks++;
+                            setProgress(Math.floor((completedChunks / chunks.length) * 100));
+                        } catch (error) {
+                            addErrorLog(`Failed to process chunk #${index + 1}: ${error instanceof Error ? error.message : String(error)}`);
                         }
-                    } catch (error) {
-                        addErrorLog(`Failed to process chunk #${i + 1}: ${error instanceof Error ? error.message : String(error)}`);
-                    }
-                }
+                    };
 
-                addLog('All chunks processed.');
+                    // Process chunks in batches of CONCURRENT_CHUNKS
+                    for (let i = 0; i < chunks.length; i += CONCURRENT_CHUNKS) {
+                        const batch = chunks.slice(i, i + CONCURRENT_CHUNKS);
+                        const promises = batch.map((_, index) => processChunk(i + index));
+                        await Promise.all(promises);
+                        
+                        // Small delay between batches to prevent overwhelming the server
+                        if (i + CONCURRENT_CHUNKS < chunks.length) {
+                            await new Promise(resolve => setTimeout(resolve, 200));
+                        }
+                    }
+                };
+
+                try {
+                    await processChunksInParallel();
+                    addLog('All chunks processed.');
+                } catch (error) {
+                    addErrorLog(`Error in parallel processing: ${error instanceof Error ? error.message : String(error)}`);
+                } finally {
+                    setIsUploading(false);
+                }
             },
             error: (error) => {
                 addErrorLog(`CSV parsing error: ${error.message}`);
