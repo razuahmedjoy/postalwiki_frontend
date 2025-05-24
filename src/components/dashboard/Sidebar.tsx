@@ -129,25 +129,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
             label="Orders"
             onClick={handleItemClick}
           /> */}
-{/* 
+
           <SidebarGroup
             icon={<Users className="h-5 w-5" />}
-            label="User Management"
+            label="Social Scrape"
             defaultOpen
           >
             <SidebarItem
-              to="/dashboard/users"
+              to="/dashboard/social-scrape-import"
               icon={<div className="h-2 w-2 rounded-full bg-current" />}
-              label="All Users"
+              label="Social Scrape Import"
               onClick={handleItemClick}
             />
-            <SidebarItem
-              to="/dashboard/users/new"
-              icon={<div className="h-2 w-2 rounded-full bg-current" />}
-              label="Add User"
-              onClick={handleItemClick}
-            />
-          </SidebarGroup> */}
+  
+          </SidebarGroup>
           <SidebarItem
             to="/dashboard/ss-url-import"
             icon={<Upload className="h-5 w-5" />}

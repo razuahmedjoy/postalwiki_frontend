@@ -11,6 +11,8 @@ import Papa from 'papaparse';
 import { Spinner } from '@/components/ui/spinner';
 import { useSSUrlCollections } from '@/api/ssUrl';
 import { axiosInstance } from '@/lib/axios';
+import { Skeleton } from '@/components/ui/skeleton';
+// import 'react-loading-skeleton/dist/skeleton.css'
 
 interface CSVRow {
     url: string;
@@ -294,6 +296,11 @@ const SSUrlImport: React.FC = () => {
                                 <div className="bg-muted rounded-md p-2 col-span-2">
                                     <p className="text-sm text-muted-foreground">Existing Records</p>
                                     <p className="text-xl font-bold">{data?.totalCount}</p>
+                                    {
+                                        isLoading && (
+                                            <Skeleton className="h-6 w-1/2 mt-2 bg-gray-300" />
+                                        )
+                                    }
                                 </div>
                                 <div className="bg-muted rounded-md p-2">
                                     <p className="text-sm text-muted-foreground">Total Records</p>
