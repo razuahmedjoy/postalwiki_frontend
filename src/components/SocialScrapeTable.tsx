@@ -23,16 +23,18 @@ import { usePaginatedSocialScrapes } from '@/api/socialScrape';
 export function SocialScrapeTable() {
     const [page, setPage] = useState(1);
     const [searchUrl, setSearchUrl] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const limit = 500;
 
     const { data, isLoading, isFetching } = usePaginatedSocialScrapes({
         page,
         limit,
-        searchUrl: searchUrl || undefined,
+        searchUrl: searchQuery || undefined,
     });
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
+        setSearchQuery(searchUrl); // Only update the search query when button is clicked
         setPage(1); // Reset to first page on new search
     };
 
