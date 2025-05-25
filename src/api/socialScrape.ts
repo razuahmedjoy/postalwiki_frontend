@@ -62,7 +62,7 @@ export const useSocialScrapeStats = () => {
         staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
         gcTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes
         refetchOnWindowFocus: false, // Don't refetch when window regains focus
-        refetchOnMount: false, // Don't refetch when component mounts
+        refetchOnMount: true, // Don't refetch when component mounts
     });
 };
 
