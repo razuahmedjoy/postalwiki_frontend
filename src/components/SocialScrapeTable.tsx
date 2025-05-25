@@ -23,9 +23,9 @@ import { usePaginatedSocialScrapes } from '@/api/socialScrape';
 export function SocialScrapeTable() {
     const [page, setPage] = useState(1);
     const [searchUrl, setSearchUrl] = useState('');
-    const limit = 10;
+    const limit = 500;
 
-    const { data, isLoading } = usePaginatedSocialScrapes({
+    const { data, isLoading, isFetching } = usePaginatedSocialScrapes({
         page,
         limit,
         searchUrl: searchUrl || undefined,
@@ -123,18 +123,25 @@ export function SocialScrapeTable() {
 
                 <form onSubmit={handleSearch} className="flex gap-4">
                     <Input
-                        
                         type="text"
                         placeholder="Search by URL..."
                         value={searchUrl}
                         onChange={(e) => setSearchUrl(e.target.value)}
                         className="w-full max-w-sm p-1"
                     />
-                    <Button size='sm' type="submit">Search</Button>
+                    <Button size='sm' type="submit" disabled={isLoading}>Search</Button>
                 </form>
             </div>
 
-            <div className="rounded-md border">
+            <div className="rounded-md border relative">
+                {(isLoading || isFetching) && (
+                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
+                        <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                            <span className="text-sm">Loading...</span>
+                        </div>
+                    </div>
+                )}
                 <Table>
                     <TableHeader>
                         <TableRow>
