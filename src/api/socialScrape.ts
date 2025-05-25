@@ -15,6 +15,43 @@ interface ImportProgress {
     error?: string;
 }
 
+interface SocialScrape {
+    _id: string;
+    url: string;
+    date: string;
+    title: string;
+    twitter: string;
+    facebook: string;
+    instagram: string;
+    linkedin: string;
+    youtube: string;
+    pinterest: string;
+    email: string;
+    phone: string;
+    postcode: string;
+    keywords: string;
+    statusCode: string;
+    redirect_url: string;
+    meta_description: string;
+}
+
+interface PaginatedResponse {
+    success: boolean;
+    data: SocialScrape[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+interface PaginatedParams {
+    page: number;
+    limit: number;
+    searchUrl?: string;
+}
+
 export const useSocialScrapeStats = () => {
     return useQuery({
         queryKey: ['social-scrape-stats'],
@@ -34,6 +71,18 @@ export const useSocialScrapeImport = () => {
             const { data } = await axiosInstance.post('/social-scrape/import');
             return data;
         },
+    });
+};
 
+export const usePaginatedSocialScrapes = (params: PaginatedParams) => {
+    return useQuery({
+        queryKey: ['social-scrapes', params],
+        queryFn: async () => {
+            const { data } = await axiosInstance.get<PaginatedResponse>('/social-scrape/paginated', {
+                params,
+            });
+            return data;
+        },
+        placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
     });
 }; 

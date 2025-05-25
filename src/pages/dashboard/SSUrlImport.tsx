@@ -295,7 +295,7 @@ const SSUrlImport: React.FC = () => {
                                 
                                 <div className="bg-muted rounded-md p-2 col-span-2">
                                     <p className="text-sm text-muted-foreground">Existing Records</p>
-                                    <p className="text-xl font-bold">{data?.totalCount}</p>
+                                    <p className="text-xl font-bold">{data?.totalCount.toLocaleString()}</p>
                                     {
                                         isLoading && (
                                             <Skeleton className="h-6 w-1/2 mt-2 bg-gray-300" />

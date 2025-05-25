@@ -141,7 +141,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Social Scrape Import"
               onClick={handleItemClick}
             />
-  
+            <SidebarItem
+              to="/dashboard/social-scrape"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Social Scrape Data"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
           <SidebarItem
             to="/dashboard/ss-url-import"

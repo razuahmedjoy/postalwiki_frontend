@@ -19,6 +19,7 @@ import SSUrlImport from "./pages/dashboard/SSUrlImport";
 import Login from "./pages/auth/Login";
 import MongoDBStats from "./pages/dashboard/MongoDBStats";
 import SocialScrapeImport from "./pages/dashboard/SocialScrape/SocialScrapeImport";
+import { SocialScrapePage } from "./pages/dashboard/SocialScrape/SocialScrapePage";
 
 const App = () => (
   <QueryProvider>
@@ -49,9 +50,11 @@ const App = () => (
               <Route path="users/new" element={<UserForm />} />
               <Route path="orders" element={<Orders />} />
               <Route path="settings" element={<Settings />} />
+              
               <Route path="ss-url-import" element={<SSUrlImport />} />
               <Route path="mongodb-stats" element={<MongoDBStats />} />
               <Route path="social-scrape-import" element={<SocialScrapeImport />} />
+              <Route path="social-scrape" element={<SocialScrapePage />} />
             </Route>
 
             {/* Catch-all route */}

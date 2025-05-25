@@ -163,7 +163,7 @@ const SocialScrapeImport: React.FC = () => {
                 {isLoadingStats ? (
                     <p>Loading stats...</p>
                 ) : (
-                    <p>Total records: {stats}</p>
+                    <p>Total records: {stats.toLocaleString()}</p>
                 )}
             </div>
 
