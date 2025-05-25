@@ -166,7 +166,7 @@ export function SocialScrapeTable() {
                                 <TableRow key={item._id}>
                                     <TableCell className="max-w-xs truncate">
                                         <a
-                                            href={item.url}
+                                            href={`https://${item.url}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 hover:underline"
