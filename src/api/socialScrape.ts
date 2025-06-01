@@ -33,6 +33,7 @@ interface SocialScrape {
     statusCode: string;
     redirect_url: string;
     meta_description: string;
+    is_blacklisted: boolean;
 }
 
 interface PaginatedResponse {
@@ -86,5 +87,21 @@ export const usePaginatedSocialScrapes = (params: PaginatedParams) => {
             return data;
         },
         placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
+    });
+};
+
+export const useUpdateBlacklist = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async (urlColumn?: number) => {
+            const response = await axiosInstance.post('/social-scrape/update-blacklist', {
+                urlColumn: urlColumn || 2
+            });
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['socialScrapeStats'] });
+        }
     });
 }; 

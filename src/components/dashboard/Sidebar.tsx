@@ -147,6 +147,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Social Scrape Data"
               onClick={handleItemClick}
             />
+            <SidebarItem
+              to="/dashboard/social-scrape/blacklist"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Blacklist Processing"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
           <SidebarItem
             to="/dashboard/ss-url-import"

@@ -270,6 +270,12 @@ export function SocialScrapeTable() {
                                                     <span className="text-muted-foreground">{item.meta_description}</span>
                                                 </div>
                                             )}
+                                            {item.is_blacklisted && (
+                                                <div className="flex gap-1">
+                                                    <span className="text-sm font-medium">Blacklisted</span>
+                                                    <span className="text-muted-foreground">Yes</span>
+                                                </div>
+                                            )}
                                             
                                         </div>
                                     </TableCell>

@@ -63,7 +63,7 @@ const SocialScrapeImport: React.FC = () => {
 
     const fetchProgress = async () => {
         try {
-            const response = await axiosInstance.get('/social-scrape/progress');
+            const response = await axiosInstance.get('/social-scrape/import-progress');
             if (response.data.success) {
                 const newProgress = response.data.data;
                 setProgress(newProgress);
@@ -72,10 +72,11 @@ const SocialScrapeImport: React.FC = () => {
                 if (newProgress.currentFile && newProgress.processed > 0) {
                     setLogs(prev => {
                         const lastLog = prev[prev.length - 1];
-                        if (!lastLog || lastLog.message !== `Processing ${newProgress.currentFile}: ${newProgress.processed} records`) {
+                        const newMessage = `Processing ${newProgress.currentFile}: ${newProgress.processed} records`;
+                        if (!lastLog || lastLog.message !== newMessage) {
                             return [...prev, {
                                 type: 'success',
-                                message: `Processing ${newProgress.currentFile}: ${newProgress.processed} records`
+                                message: newMessage
                             }];
                         }
                         return prev;
@@ -87,10 +88,11 @@ const SocialScrapeImport: React.FC = () => {
                     newProgress.errors.forEach(error => {
                         setLogs(prev => {
                             const lastLog = prev[prev.length - 1];
-                            if (!lastLog || lastLog.message !== `Error in ${error.filename}: ${error.error}`) {
+                            const newMessage = `Error in ${error.filename}: ${error.error}`;
+                            if (!lastLog || lastLog.message !== newMessage) {
                                 return [...prev, {
                                     type: 'error',
-                                    message: `Error in ${error.filename}: ${error.error}`
+                                    message: newMessage
                                 }];
                             }
                             return prev;
@@ -103,6 +105,7 @@ const SocialScrapeImport: React.FC = () => {
                     setIsPolling(false);
                     if (pollingInterval.current) {
                         clearInterval(pollingInterval.current);
+                        pollingInterval.current = undefined;
                     }
                     setLogs(prev => [...prev, {
                         type: 'success',
@@ -115,7 +118,12 @@ const SocialScrapeImport: React.FC = () => {
             setIsPolling(false);
             if (pollingInterval.current) {
                 clearInterval(pollingInterval.current);
+                pollingInterval.current = undefined;
             }
+            setLogs(prev => [...prev, {
+                type: 'error',
+                message: 'Error fetching progress'
+            }]);
         }
     };
 
@@ -134,13 +142,18 @@ const SocialScrapeImport: React.FC = () => {
         // Clear any existing polling
         if (pollingInterval.current) {
             clearInterval(pollingInterval.current);
+            pollingInterval.current = undefined;
         }
 
         startImport(undefined, {
             onSuccess: () => {
                 setIsPolling(true);
+                setLogs(prev => [...prev, {
+                    type: 'success',
+                    message: 'Starting import process...'
+                }]);
                 // Start polling every 2 seconds
-                pollingInterval.current = setInterval(fetchProgress, 3000);
+                pollingInterval.current = setInterval(fetchProgress, 2000);
                 // Fetch progress immediately
                 fetchProgress();
             },
@@ -209,19 +222,25 @@ const SocialScrapeImport: React.FC = () => {
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Import Logs</h3>
                 <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-md p-3">
-                    {logs.map((log, index) => (
-                        <div 
-                            key={index} 
-                            className={`mb-1 text-[12px] font-[monospace] ${
-                                log.type === 'success' 
-                                    ? 'text-green-400' 
-                                    : 'text-red-400'
-                            }`}
-                        >
-                            {log.message}
+                    {logs.length === 0 ? (
+                        <p className="text-gray-500">No logs available</p>
+                    ) : (
+                        <div className="space-y-2">
+                            {logs.map((log, index) => (
+                                <div 
+                                    key={index} 
+                                    className={`p-2 rounded ${
+                                        log.type === 'error'
+                                            ? 'bg-red-50 text-red-700'
+                                            : 'bg-green-50 text-green-700'
+                                    }`}
+                                >
+                                    {log.message}
+                                </div>
+                            ))}
+                            <div ref={logsEndRef} />
                         </div>
-                    ))}
-                    <div ref={logsEndRef} />
+                    )}
                 </div>
             </div>
 
