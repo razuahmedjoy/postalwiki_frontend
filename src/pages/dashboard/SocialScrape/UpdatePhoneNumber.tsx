@@ -90,11 +90,11 @@ const UpdatePhoneNumberPage = () => {
             <h2 className="text-2xl font-bold mb-4">Update Phone Numbers</h2>
 
             <div className="mb-6">
-                <p className="text-gray-600 mb-2">
-                    This process will read CSV files from the <code className="bg-gray-100 px-1 rounded">imports/social_scrape_phone</code> directory 
+                <p className="text-gray-200 mb-2">
+                    This process will read CSV files from the <code className="bg-gray-600 px-1 rounded">imports/social_scrape_phone</code> directory 
                     and update phone numbers for existing records or create new records with phone numbers.
                 </p>
-                <p className="text-gray-600">
+                <p className="text-gray-400">
                     <strong>CSV Format:</strong> url, [PN], phone_number (no headers)
                 </p>
             </div>

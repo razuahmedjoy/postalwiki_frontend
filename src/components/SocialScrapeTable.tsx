@@ -236,7 +236,9 @@ export function SocialScrapeTable() {
                                             {item.phone && (
                                                 <div className="flex gap-1">
                                                     <span className="text-sm font-medium">Phone</span>
-                                                    <span className="text-muted-foreground">{item.phone}</span>
+                                                    <span className="text-muted-foreground">
+                                                        {item.phone.join(', ')}
+                                                    </span>
                                                 </div>
                                             )}
                                             {item.postcode && (
