@@ -20,7 +20,9 @@ import Login from "./pages/auth/Login";
 import MongoDBStats from "./pages/dashboard/MongoDBStats";
 import SocialScrapeImport from "./pages/dashboard/SocialScrape/SocialScrapeImport";
 import { SocialScrapePage } from "./pages/dashboard/SocialScrape/SocialScrapePage";
+
 import BlacklistProcessPage from "./pages/dashboard/SocialScrape/BlacklistProcessPage";
+import UpdatePhoneNumberPage from "./pages/dashboard/SocialScrape/UpdatePhoneNumber";
 
 const App = () => (
   <QueryProvider>
@@ -57,6 +59,7 @@ const App = () => (
               <Route path="social-scrape-import" element={<SocialScrapeImport />} />
               <Route path="social-scrape" element={<SocialScrapePage />} />
               <Route path="social-scrape/blacklist" element={<BlacklistProcessPage />} />
+              <Route path="social-scrape/update-phone-number" element={<UpdatePhoneNumberPage />} />
             </Route>
 
             {/* Catch-all route */}
