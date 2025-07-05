@@ -1,15 +1,14 @@
-import React from 'react';
+import { useRef } from 'react';
 import { SocialScrapeTable } from '@/components/SocialScrapeTable';
-import { Button } from "@/components/ui/button";
-import { useNavigate } from 'react-router-dom';
 
 export function SocialScrapePage() {
-  const navigate = useNavigate();
+  // Ref for the container to scroll to top
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="p-4 mx-auto bg-background shadow-md">
-     
-      <SocialScrapeTable />
+    <div className="p-4 mx-auto bg-background shadow-md" ref={containerRef}>
+
+      <SocialScrapeTable reference={containerRef} />
     </div>
   );
 } 

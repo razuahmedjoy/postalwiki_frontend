@@ -9,6 +9,8 @@ interface PhoneProgress {
     created: number;
     errors: string[];
     isComplete: boolean;
+    totalFiles: number;
+    completedFiles: number;
 }
 
 interface ApiError {
@@ -53,9 +55,46 @@ const UpdatePhoneNumberPage = () => {
         }
     };
 
+    const stopPhoneProcessing = async () => {
+        if (!processId) {
+            setError('No active process to stop');
+            return;
+        }
+
+        try {
+            const response = await axiosInstance.post('/social-scrape/stop-phone-processing', {
+                processId: processId
+            });
+            
+            if (response.data.success) {
+                setSuccess('Phone processing stopped successfully');
+                setIsProcessing(false);
+                setProcessId(null);
+            } else {
+                setError('Failed to stop phone processing');
+            }
+        } catch (error: unknown) {
+            const apiError = error as ApiError;
+            setError(apiError.response?.data?.message || 'Failed to stop phone processing');
+        }
+    };
+
     const pollProgress = async (id: string) => {
+        let pollCount = 0;
+        const maxPolls = 300; // Maximum 10 minutes (300 * 2 seconds)
+        
         const pollInterval = setInterval(async () => {
             try {
+                pollCount++;
+                
+                // Timeout after maximum polls
+                if (pollCount > maxPolls) {
+                    clearInterval(pollInterval);
+                    setIsProcessing(false);
+                    setError('Processing timeout - please check the logs for details');
+                    return;
+                }
+                
                 const response = await axiosInstance.get(`/social-scrape/phone-progress?processId=${id}`);
                 const progressData = response.data;
                 
@@ -81,7 +120,14 @@ const UpdatePhoneNumberPage = () => {
     };
 
     const getProgressPercentage = () => {
-        if (!progress || progress.total === 0) return 0;
+        if (!progress) return 0;
+        if (progress.total === 0) {
+            // If total is 0, show progress based on completed files vs total files
+            if (progress.totalFiles > 0) {
+                return Math.round((progress.completedFiles / progress.totalFiles) * 100);
+            }
+            return 0;
+        }
         return Math.round((progress.processed / progress.total) * 100);
     };
 
@@ -172,6 +218,15 @@ const UpdatePhoneNumberPage = () => {
                         'Start Phone Number Processing'
                     )}
                 </button>
+                
+                {isProcessing && processId && (
+                    <button
+                        onClick={stopPhoneProcessing}
+                        className="ml-4 px-5 py-2.5 text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer"
+                    >
+                        Stop Processing
+                    </button>
+                )}
             </div>
 
             {progress && (
@@ -199,9 +254,21 @@ const UpdatePhoneNumberPage = () => {
                                 </span>
                             </div>
                             <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Files Progress:</span>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {progress.completedFiles || 0}/{progress.totalFiles || 0}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Processed Records:</span>
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                     {progress.processed.toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Total Records:</span>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    {progress.total.toLocaleString()}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center">

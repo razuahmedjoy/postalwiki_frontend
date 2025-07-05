@@ -27,7 +27,7 @@ interface SocialScrape {
     youtube: string;
     pinterest: string;
     email: string;
-    phone: string;
+    phone: string[];
     postcode: string;
     keywords: string;
     statusCode: string;
@@ -36,21 +36,34 @@ interface SocialScrape {
     is_blacklisted: boolean;
 }
 
-interface PaginatedResponse {
-    success: boolean;
-    data: SocialScrape[];
-    pagination: {
+// Union type for pagination response
+type PaginationResponse = 
+    | {
+        // Traditional pagination
         total: number;
         page: number;
         limit: number;
         totalPages: number;
+    }
+    | {
+        // Cursor-based pagination
+        hasNextPage: boolean;
+        nextCursor: string | null;
+        limit: number;
     };
+
+interface PaginatedResponse {
+    success: boolean;
+    data: SocialScrape[];
+    pagination: PaginationResponse;
 }
 
 interface PaginatedParams {
-    page: number;
+    page?: number;
     limit: number;
     searchUrl?: string;
+    cursor?: string;
+    useCursor?: string;
 }
 
 export const useSocialScrapeStats = () => {
@@ -86,6 +99,10 @@ export const usePaginatedSocialScrapes = (params: PaginatedParams) => {
             });
             return data;
         },
+        staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+        gcTime: 1 * 60 * 1000, // Keep data in cache for 1 minutes
+        refetchOnWindowFocus: false, // Don't refetch when window regains focus
+        refetchOnMount: true, // Don't refetch when component mounts
         placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
     });
 };

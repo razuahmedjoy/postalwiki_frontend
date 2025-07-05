@@ -101,7 +101,7 @@ const SocialScrapeImport: React.FC = () => {
                 }
 
                 // Stop polling if import is complete
-                if (newProgress.isComplete) {
+                if (newProgress.isComplete || !newProgress.isRunning) {
                     setIsPolling(false);
                     if (pollingInterval.current) {
                         clearInterval(pollingInterval.current);
