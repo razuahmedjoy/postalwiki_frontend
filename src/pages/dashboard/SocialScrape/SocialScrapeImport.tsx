@@ -170,7 +170,7 @@ const SocialScrapeImport: React.FC = () => {
 
     return (
         <div className="p-5 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Social Scrape Import - {stats.toLocaleString()}</h2>
+            <h2 className="text-2xl font-bold mb-4">Social Scrape Import - {isLoadingStats ? 'Loading...' : stats?.toLocaleString()}</h2>
 
             <div className="mb-6">
                 <p>Upload CSV files to the server in <span className="font-bold bg-black p-1 text-sm">home/lysnar/api.postalwiki.co.uk/imports/social_scrape/</span></p>
