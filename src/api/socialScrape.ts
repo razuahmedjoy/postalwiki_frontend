@@ -27,7 +27,10 @@ interface SocialScrape {
     youtube: string;
     pinterest: string;
     email: string;
-    phone: string[];
+    phone: {
+        number: string;
+        areaName: string;
+    }[];
     postcode: string;
     keywords: string;
     statusCode: string;

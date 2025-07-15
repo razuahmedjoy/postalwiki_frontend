@@ -234,7 +234,7 @@ export function SocialScrapeTable({ reference }: { reference: React.RefObject<HT
     return (
         <div className="container mx-auto py-2">
             <div className="mb-6 flex justify-between w-full">
-                <h1 className="text-xl font-bold mb-3">Social Media Scrape Data</h1>
+                <h1 className="text-xl font-bold mb-3">Social Media Scrape Data jho</h1>
 
                 <form onSubmit={handleSearch} className="flex gap-4">
                     <Input
@@ -344,12 +344,12 @@ export function SocialScrapeTable({ reference }: { reference: React.RefObject<HT
                                                     <span className="text-muted-foreground">{item.email}</span>
                                                 </div>
                                             )}
-                                            {item.phone && Array.isArray(item.phone) && (
+                                            {item?.phone?.length > 0 && (
                                                 <div className="flex gap-1">
                                                     <span className="text-sm font-medium">Phone</span>
-                                                    <span className="text-muted-foreground">
-                                                        {item.phone.join(', ')}
-                                                    </span>
+                                                    {item.phone.map((p) => (
+                                                        <span key={p.number} className="text-muted-foreground">{p.number} - {p.areaName}</span>
+                                                    ))}
                                                 </div>
                                             )}
                                             {item.postcode && (

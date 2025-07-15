@@ -80,21 +80,11 @@ const UpdatePhoneNumberPage = () => {
     };
 
     const pollProgress = async (id: string) => {
-        let pollCount = 0;
-        const maxPolls = 300; // Maximum 10 minutes (300 * 2 seconds)
+
         
         const pollInterval = setInterval(async () => {
             try {
-                pollCount++;
-                
-                // Timeout after maximum polls
-                if (pollCount > maxPolls) {
-                    clearInterval(pollInterval);
-                    setIsProcessing(false);
-                    setError('Processing timeout - please check the logs for details');
-                    return;
-                }
-                
+           
                 const response = await axiosInstance.get(`/social-scrape/phone-progress?processId=${id}`);
                 const progressData = response.data;
                 
@@ -132,12 +122,12 @@ const UpdatePhoneNumberPage = () => {
     };
 
     return (
-        <div className="p-5 max-w-4xl mx-auto">
+        <div className="p-5 mx-auto">
             <h2 className="text-2xl font-bold mb-4">Update Phone Numbers</h2>
 
             <div className="mb-6">
-                <p className="text-gray-200 mb-2">
-                    This process will read CSV files from the <code className="bg-gray-600 px-1 rounded">imports/social_scrape_phone</code> directory 
+                <p className="text-gray-600 dark:text-gray-200 mb-2">
+                    This process will read CSV files from the <code className="bg-gray-600 text-white px-1 rounded">imports/social_scrape_phone</code> directory 
                     and update phone numbers for existing records or create new records with phone numbers.
                 </p>
                 <p className="text-gray-400">
