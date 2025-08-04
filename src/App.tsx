@@ -23,7 +23,8 @@ import { SocialScrapePage } from "./pages/dashboard/SocialScrape/SocialScrapePag
 
 import BlacklistProcessPage from "./pages/dashboard/SocialScrape/BlacklistProcessPage";
 import UpdatePhoneNumberPage from "./pages/dashboard/SocialScrape/UpdatePhoneNumber";
-
+import BostalImport from "./pages/dashboard/Bostal/BostalImport";
+import BotsolList from "./pages/dashboard/Bostal/BotsolList";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -53,13 +54,19 @@ const App = () => (
               <Route path="users/new" element={<UserForm />} />
               <Route path="orders" element={<Orders />} />
               <Route path="settings" element={<Settings />} />
-              
+
               <Route path="ss-url-import" element={<SSUrlImport />} />
               <Route path="mongodb-stats" element={<MongoDBStats />} />
               <Route path="social-scrape-import" element={<SocialScrapeImport />} />
               <Route path="social-scrape" element={<SocialScrapePage />} />
               <Route path="social-scrape/blacklist" element={<BlacklistProcessPage />} />
               <Route path="social-scrape/update-phone-number" element={<UpdatePhoneNumberPage />} />
+
+
+              <Route path="botsol">
+                <Route path="import" element={<BostalImport />} />
+                <Route path="list" element={<BotsolList />} />
+              </Route>
             </Route>
 
             {/* Catch-all route */}

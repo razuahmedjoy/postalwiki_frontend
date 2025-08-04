@@ -14,7 +14,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -122,7 +122,7 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 };

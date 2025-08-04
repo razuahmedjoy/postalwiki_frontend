@@ -169,7 +169,7 @@ const SocialScrapeImport: React.FC = () => {
     };
 
     return (
-        <div className="p-5 max-w-4xl mx-auto">
+        <div className="p-5 mx-auto">
             <h2 className="text-2xl font-bold mb-4">Social Scrape Import - {isLoadingStats ? 'Loading...' : stats?.toLocaleString()}</h2>
 
             <div className="mb-6">

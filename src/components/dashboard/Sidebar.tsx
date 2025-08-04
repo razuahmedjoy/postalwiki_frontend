@@ -13,7 +13,7 @@ interface SidebarItemProps {
 }
 
 interface SidebarGroupProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   label: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
@@ -63,7 +63,7 @@ const SidebarGroup: React.FC<SidebarGroupProps> = ({ icon, label, children, defa
         className="sidebar-item w-full flex justify-between"
       >
         <div className="flex items-center gap-3">
-          {icon}
+          {icon || <div className="h-2 w-2 rounded-full bg-current" />}
           <span>{label}</span>
         </div>
         {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -159,6 +159,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Update Phone Number"
               onClick={handleItemClick}
             />
+          </SidebarGroup>
+          <SidebarGroup
+            label="Bostal DataBase"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/botsol/import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Botsol Import"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/botsol/list"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Botsol List"
+              onClick={handleItemClick}
+            />
+
           </SidebarGroup>
           <SidebarItem
             to="/dashboard/ss-url-import"
