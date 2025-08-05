@@ -302,6 +302,13 @@ export function BotsolListTable({ reference }: { reference: React.RefObject<HTML
                                                     <span className="text-muted-foreground">{item.company_name}</span>
                                                 </div>
                                             )}
+                                            {item.address && (
+                                                <div className="flex gap-1">
+                                                    <span className="text-sm font-medium">Address</span>
+                                                    <span className="text-muted-foreground">{item.address}</span>
+                                                </div>
+                                            )}
+                                            
                                             {item.twitter && (
                                                 <div className="flex gap-1">
                                                     <span className="text-sm font-medium">Twitter</span>
