@@ -25,6 +25,7 @@ import BlacklistProcessPage from "./pages/dashboard/SocialScrape/BlacklistProces
 import UpdatePhoneNumberPage from "./pages/dashboard/SocialScrape/UpdatePhoneNumber";
 import BostalImport from "./pages/dashboard/Bostal/BostalImport";
 import BotsolList from "./pages/dashboard/Bostal/BotsolList";
+import MatchAdultKeywordsPage from "./pages/dashboard/SocialScrape/MatchAdultKeywordsPage";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -57,10 +58,13 @@ const App = () => (
 
               <Route path="ss-url-import" element={<SSUrlImport />} />
               <Route path="mongodb-stats" element={<MongoDBStats />} />
+
+              {/* social scrape */}
               <Route path="social-scrape-import" element={<SocialScrapeImport />} />
               <Route path="social-scrape" element={<SocialScrapePage />} />
               <Route path="social-scrape/blacklist" element={<BlacklistProcessPage />} />
               <Route path="social-scrape/update-phone-number" element={<UpdatePhoneNumberPage />} />
+              <Route path="social-scrape/match-adult-keywords" element={<MatchAdultKeywordsPage />} />
 
 
               <Route path="botsol">

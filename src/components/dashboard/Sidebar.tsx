@@ -159,6 +159,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Update Phone Number"
               onClick={handleItemClick}
             />
+            <SidebarItem
+              to="/dashboard/social-scrape/match-adult-keywords"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Match Adult Keywords"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
           <SidebarGroup
             label="Bostal DataBase"
