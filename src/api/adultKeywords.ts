@@ -137,6 +137,29 @@ export const useStopAdultKeywordsMatching = () => {
     });
 };
 
+export const useBulkProcessReferences = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async ({ recordIds, isAdultContent }: { recordIds: string[], isAdultContent: boolean }) => {
+            const { data } = await axiosInstance.post('/adult-keywords/references/bulk-process', {
+                recordIds,
+                isAdultContent
+            });
+            return data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch references and stats
+            queryClient.invalidateQueries({ queryKey: ['adult-keywords-references'] });
+            queryClient.invalidateQueries({ queryKey: ['adult-keywords-references-paginated'] });
+            queryClient.invalidateQueries({ queryKey: ['adult-keywords-stats'] });
+        },
+        onError: (error) => {
+            console.error('Failed to bulk process references:', error);
+        }
+    });
+};
+
 // Utility function to format progress percentage
 export const getProgressPercentage = (progress: AdultKeywordsProgress): number => {
     if (progress.total === 0) return 0;

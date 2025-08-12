@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import {
     Pagination,
     PaginationContent,
@@ -19,24 +19,16 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+
 import { 
-    Search, 
-    Filter, 
-    Eye, 
     CheckCircle, 
-    Clock,
     ExternalLink,
-    FileText
+    FileText,
+    AlertTriangle
 } from 'lucide-react';
-import { usePaginatedAdultKeywordsReferences } from '@/api/adultKeywords';
-import { AdultKeywordsReference } from '@/types/adultKeywords';
+import { usePaginatedAdultKeywordsReferences, useBulkProcessReferences } from '@/api/adultKeywords';
+import { useEffect } from 'react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function AdultKeywordsReferencesTable() {
     const [page, setPage] = useState(1);
@@ -45,6 +37,9 @@ export function AdultKeywordsReferencesTable() {
     const [processed, setProcessed] = useState<boolean | null>(null);
     const [searchUrl, setSearchUrl] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
+    const [selectAll, setSelectAll] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string>('');
 
     const { data, isLoading, isFetching } = usePaginatedAdultKeywordsReferences(
         page, 
@@ -53,19 +48,36 @@ export function AdultKeywordsReferencesTable() {
         processed
     );
 
+    const bulkProcessMutation = useBulkProcessReferences();
+
+    useEffect(() => {
+        // Reset selection when data changes
+        setSelectedRecords(new Set());
+        setSelectAll(false);
+    }, [data]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setSearchUrl(searchQuery);
         setPage(1);
+        // Reset selection when search changes
+        setSelectedRecords(new Set());
+        setSelectAll(false);
     };
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
+        // Reset selection when page changes
+        setSelectedRecords(new Set());
+        setSelectAll(false);
     };
 
     const handleFilterChange = (newMatchType: string) => {
         setMatchType(newMatchType);
         setPage(1);
+        // Reset selection when filters change
+        setSelectedRecords(new Set());
+        setSelectAll(false);
     };
 
     const handleProcessedChange = (newProcessed: string) => {
@@ -75,6 +87,108 @@ export function AdultKeywordsReferencesTable() {
             setProcessed(newProcessed === 'true');
         }
         setPage(1);
+        // Reset selection when filters change
+        setSelectedRecords(new Set());
+        setSelectAll(false);
+    };
+
+    // Selection handlers
+    const handleSelectAll = () => {
+        if (selectAll) {
+            setSelectedRecords(new Set());
+            setSelectAll(false);
+        } else {
+            const allIds = new Set(data?.references.map(ref => ref._id) || []);
+            setSelectedRecords(allIds);
+            setSelectAll(true);
+        }
+    };
+
+    const handleSelectRecord = (recordId: string) => {
+        const newSelected = new Set(selectedRecords);
+        if (newSelected.has(recordId)) {
+            newSelected.delete(recordId);
+            setSelectAll(false);
+        } else {
+            newSelected.add(recordId);
+            // Check if all records are now selected
+            if (data?.references && newSelected.size === data.references.length) {
+                setSelectAll(true);
+            }
+        }
+        setSelectedRecords(newSelected);
+    };
+
+    const handleUnselectAll = () => {
+        setSelectedRecords(new Set());
+        setSelectAll(false);
+    };
+
+    const handleBulkAction = (action: string) => {
+        if (selectedRecords.size === 0) return;
+        
+        // Here you can implement different bulk actions
+        console.log(`Performing ${action} on ${selectedRecords.size} selected records:`, Array.from(selectedRecords));
+        
+        // Example actions:
+        switch (action) {
+            case 'mark-processed':
+                // Implement mark as processed logic
+                alert(`Marking ${selectedRecords.size} records as processed`);
+                break;
+            case 'mark-pending':
+                // Implement mark as pending logic
+                alert(`Marking ${selectedRecords.size} records as pending`);
+                break;
+            case 'delete':
+                // Confirm deletion
+                if (confirm(`Are you sure you want to delete ${selectedRecords.size} selected records? This action cannot be undone.`)) {
+                    alert(`Deleting ${selectedRecords.size} records`);
+                    // Implement delete logic here
+                }
+                break;
+            case 'export':
+                // Implement export logic
+                alert(`Exporting ${selectedRecords.size} records`);
+                break;
+            default:
+                break;
+        }
+        
+        // Clear selection after action
+        setSelectedRecords(new Set());
+        setSelectAll(false);
+    };
+
+    const handleBulkProcess = async (isAdultContent: boolean) => {
+        if (selectedRecords.size === 0) return;
+        
+        const recordIds = Array.from(selectedRecords);
+        const actionText = isAdultContent ? 'mark as adult content' : 'mark as not adult content';
+        
+        try {
+            const result = await bulkProcessMutation.mutateAsync({ recordIds, isAdultContent });
+            
+            // Show success message
+            setSuccessMessage(result.message);
+            
+            // Clear selection after successful processing
+            setSelectedRecords(new Set());
+            setSelectAll(false);
+            
+            // Clear success message after 5 seconds
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+            
+        } catch (error) {
+            console.error(`Failed to ${actionText}:`, error);
+            // Show error message
+            setSuccessMessage(`Error: Failed to ${actionText}. Please try again.`);
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+        }
     };
 
     const getMatchTypeBadge = (matchType: string) => {
@@ -122,61 +236,7 @@ export function AdultKeywordsReferencesTable() {
             </div>
 
             {/* Filters and Search */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Filter className="h-5 w-5" />
-                        Filters & Search
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Search */}
-                        <div className="md:col-span-2 lg:col-span-2">
-                            <form onSubmit={handleSearch} className="flex gap-2">
-                                <Input
-                                    placeholder="Search by URL..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="flex-1"
-                                />
-                                <Button type="submit" size="sm" className="flex-shrink-0">
-                                    <Search className="h-4 w-4" />
-                                </Button>
-                            </form>
-                        </div>
-
-                        {/* Match Type Filter */}
-                        <div className="w-full">
-                            <Select value={matchType} onValueChange={handleFilterChange}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="All Match Types" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Match Types</SelectItem>
-                                    <SelectItem value="exact">Exact Matches</SelectItem>
-                                    <SelectItem value="contains">Contains Matches</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Processed Filter */}
-                        <div className="w-full">
-                            <Select value={processed === null ? 'all' : processed.toString()} onValueChange={handleProcessedChange}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="All Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="false">Pending</SelectItem>
-                                    <SelectItem value="true">Processed</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
+        
             {/* Results Summary */}
             {data && (
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -192,6 +252,86 @@ export function AdultKeywordsReferencesTable() {
                 </div>
             )}
 
+            {/* Selection Controls and Bulk Actions */}
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        {/* Selection Controls */}
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectAll}
+                                    onChange={handleSelectAll}
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <label className="text-sm font-medium">
+                                    {selectAll ? 'Unselect All' : 'Select All'}
+                                </label>
+                            </div>
+                            
+                            {selectedRecords.size > 0 && (
+                                <>
+                                    <span className="text-sm text-muted-foreground">
+                                        {selectedRecords.size} record{selectedRecords.size !== 1 ? 's' : ''} selected
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleUnselectAll}
+                                        className="text-xs"
+                                    >
+                                        Clear Selection
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Bulk Action Buttons */}
+                        {selectedRecords.size > 0 && (
+                            <div className="flex items-center gap-2">
+                                {bulkProcessMutation.isPending && (
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                        Processing {selectedRecords.size} records...
+                                    </div>
+                                )}
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleBulkProcess(true)}
+                                    disabled={bulkProcessMutation.isPending}
+                                    className="text-xs"
+                                >
+                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                    Mark as Adult Content
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleBulkProcess(false)}
+                                    disabled={bulkProcessMutation.isPending}
+                                    className="text-xs"
+                                >
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Mark as Not Adult Content
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Success Message */}
+            {successMessage && (
+                <Alert className="border-green-200 bg-green-50">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-800">
+                        {successMessage}
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Table */}
             <Card>
                 <CardContent className="p-0">
@@ -205,6 +345,7 @@ export function AdultKeywordsReferencesTable() {
                             <Table className="w-full border-collapse table-fixed md:table-auto">
                                 <TableHeader>
                                     <TableRow>
+                                        <TableHead className="min-w-[40px] bg-muted/50">Select</TableHead>
                                         <TableHead className="min-w-[120px] md:min-w-[180px] bg-muted/50 sticky left-0 z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">URL</TableHead>
                                         <TableHead className="min-w-[250px] md:min-w-[350px] bg-muted/50">Content Details</TableHead>
                                         <TableHead className="min-w-[100px] md:min-w-[120px] bg-muted/50">Matched Keywords</TableHead>
@@ -217,6 +358,14 @@ export function AdultKeywordsReferencesTable() {
                                 <TableBody>
                                     {data?.references.map((reference) => (
                                         <TableRow key={reference._id} className="hover:bg-muted/50">
+                                            <TableCell className="min-w-[40px] max-w-[50px] p-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedRecords.has(reference._id)}
+                                                    onChange={() => handleSelectRecord(reference._id)}
+                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                            </TableCell>
                                             <TableCell className="min-w-[120px] md:min-w-[180px] max-w-[200px] sticky left-0 bg-background z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">
                                                 <div className="flex items-center gap-2">
                                                     <a
@@ -375,4 +524,4 @@ export function AdultKeywordsReferencesTable() {
             )}
         </div>
     );
-} 
+}
