@@ -39,7 +39,7 @@ export const useAdultKeywordsProgress = (enabled: boolean = false) => {
         gcTime: 5 * 60 * 1000, // Keep data in cache for 5 minutes
         refetchOnWindowFocus: false,
         refetchOnMount: true,
-        refetchInterval: enabled ? 2000 : false, // Only poll when enabled
+        refetchInterval: enabled ? 3500 : false, // Poll every 3.5 seconds when enabled
         enabled: enabled, // Only run query when enabled
     });
 };

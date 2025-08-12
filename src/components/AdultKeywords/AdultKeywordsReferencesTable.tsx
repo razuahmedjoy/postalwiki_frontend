@@ -34,7 +34,7 @@ export function AdultKeywordsReferencesTable() {
     const [page, setPage] = useState(1);
     const [limit] = useState(50);
     const [matchType, setMatchType] = useState<string>('all');
-    const [processed, setProcessed] = useState<boolean | null>(null);
+    const [processed, setProcessed] = useState<boolean | null>(false);
     const [searchUrl, setSearchUrl] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
