@@ -237,6 +237,82 @@ export function AdultKeywordsDashboard() {
                 </CardContent>
             </Card>
 
+            {/* Memory Status - Server Health */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Database className="h-5 w-5" />
+                        Server Memory Status
+                    </CardTitle>
+                    <CardDescription>
+                        Monitor server memory usage during processing
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-600">
+                                {isProcessing ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                        <span className="text-sm">Monitoring...</span>
+                                    </div>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Heap Used (MB)</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-green-600">
+                                {isProcessing ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                                        <span className="text-sm">Monitoring...</span>
+                                    </div>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Heap Total (MB)</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-purple-600">
+                                {isProcessing ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                                        <span className="text-sm">Monitoring...</span>
+                                    </div>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Memory Usage %</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-orange-600">
+                                {isProcessing ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+                                        <span className="text-sm">Monitoring...</span>
+                                    </div>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">RSS (MB)</div>
+                        </div>
+                    </div>
+                    {isProcessing && (
+                        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm text-blue-800">
+                                <strong>Memory Optimization Active:</strong> Processing in small chunks with automatic garbage collection to prevent memory issues.
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
             {/* Statistics - Live Progress Data */}
             <Card>
                 <CardHeader>
@@ -360,65 +436,16 @@ export function AdultKeywordsDashboard() {
                 </CardContent>
             </Card>
 
-            {/* Database Summary - Overall Statistics */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Database className="h-5 w-5" />
-                        Database Summary
-                    </CardTitle>
-                    <CardDescription className="flex items-center justify-between">
-                        <span>
-                            Overall statistics from the adult keywords database
-                            {stats && (
-                                <span className="ml-2 text-xs">
-                                    • Last updated: {new Date().toLocaleTimeString()}
-                                </span>
-                            )}
-                        </span>
-                        <Button
-                            onClick={() => refetchStats()}
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2"
-                            disabled={statsLoading}
-                        >
-                            <RefreshCw className={`h-3 w-3 ${statsLoading ? 'animate-spin' : ''}`} />
-                        </Button>
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-blue-600">{stats?.totalReferences || 0}</div>
-                            <div className="text-sm text-muted-foreground">Total References</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-yellow-600">{stats?.unprocessedReferences || 0}</div>
-                            <div className="text-sm text-muted-foreground">Unprocessed</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-red-600">{stats?.exactMatches || 0}</div>
-                            <div className="text-sm text-muted-foreground">DB Exact Matches</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">{stats?.containsMatches || 0}</div>
-                            <div className="text-sm text-muted-foreground">DB Contains Matches</div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
             {/* Current Progress Details */}
-            {progress && (progress.processed > 0 || progress.errors.length > 0) && (
+            {progress && progress.isComplete && (progress.processed > 0 || progress.errors.length > 0) && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5" />
-                            Current Session Results
+                            Processing Summary
                         </CardTitle>
                         <CardDescription>
-                            Results from the current processing session
+                            Final results from the completed processing session
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
