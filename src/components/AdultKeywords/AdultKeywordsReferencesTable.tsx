@@ -24,7 +24,8 @@ import {
     CheckCircle, 
     ExternalLink,
     FileText,
-    AlertTriangle
+    AlertTriangle,
+    Eye
 } from 'lucide-react';
 import { usePaginatedAdultKeywordsReferences, useBulkProcessReferences } from '@/api/adultKeywords';
 import { useEffect } from 'react';
@@ -40,8 +41,9 @@ export function AdultKeywordsReferencesTable() {
     const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
     const [selectAll, setSelectAll] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [processingRecords, setProcessingRecords] = useState<Set<string>>(new Set());
 
-    const { data, isLoading, isFetching } = usePaginatedAdultKeywordsReferences(
+    const { data, isLoading, isFetching, refetch } = usePaginatedAdultKeywordsReferences(
         page, 
         limit, 
         matchType === 'all' ? undefined : matchType, 
@@ -90,6 +92,44 @@ export function AdultKeywordsReferencesTable() {
         // Reset selection when filters change
         setSelectedRecords(new Set());
         setSelectAll(false);
+    };
+
+    // Individual record processing
+    const handleIndividualProcess = async (recordId: string, isAdultContent: boolean) => {
+        if (processingRecords.has(recordId)) return;
+        
+        setProcessingRecords(prev => new Set(prev).add(recordId));
+        
+        try {
+            const result = await bulkProcessMutation.mutateAsync({ 
+                recordIds: [recordId], 
+                isAdultContent 
+            });
+            
+            // Show success message
+            setSuccessMessage(result.message);
+            
+            // Refresh data to show updated status
+            refetch();
+            
+            // Clear success message after 5 seconds
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+            
+        } catch (error) {
+            console.error(`Failed to process record ${recordId}:`, error);
+            setSuccessMessage(`Error: Failed to process record. Please try again.`);
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+        } finally {
+            setProcessingRecords(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(recordId);
+                return newSet;
+            });
+        }
     };
 
     // Selection handlers
@@ -175,6 +215,9 @@ export function AdultKeywordsReferencesTable() {
             // Clear selection after successful processing
             setSelectedRecords(new Set());
             setSelectAll(false);
+            
+            // Refresh data to show updated status
+            refetch();
             
             // Clear success message after 5 seconds
             setTimeout(() => {
@@ -345,20 +388,17 @@ export function AdultKeywordsReferencesTable() {
                             <Table className="w-full border-collapse table-fixed md:table-auto">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="min-w-[40px] bg-muted/50">Select</TableHead>
-                                        <TableHead className="min-w-[120px] md:min-w-[180px] bg-muted/50 sticky left-0 z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">URL</TableHead>
-                                        <TableHead className="min-w-[250px] md:min-w-[350px] bg-muted/50">Content Details</TableHead>
+                                        <TableHead className="min-w-[10px] bg-muted/50">Select</TableHead>
+                                        <TableHead className="min-w-[200px] md:min-w-[250px] bg-muted/50 sticky left-0 z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">URL & Actions</TableHead>
+                                        <TableHead className="min-w-[250px] md:min-w-[250px] bg-muted/50">Content Details</TableHead>
                                         <TableHead className="min-w-[100px] md:min-w-[120px] bg-muted/50">Matched Keywords</TableHead>
-                                        <TableHead className="min-w-[80px] md:min-w-[100px] bg-muted/50">Match Type</TableHead>
-                                        <TableHead className="min-w-[60px] md:min-w-[80px] bg-muted/50">Status</TableHead>
-                                        <TableHead className="min-w-[80px] md:min-w-[100px] bg-muted/50">Source</TableHead>
-                                        <TableHead className="min-w-[100px] md:min-w-[120px] bg-muted/50">Created</TableHead>
+                                        <TableHead className="min-w-[300px] md:min-w-[400px] bg-muted/50">Website Preview</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {data?.references.map((reference) => (
-                                        <TableRow key={reference._id} className="hover:bg-muted/50">
-                                            <TableCell className="min-w-[40px] max-w-[50px] p-2">
+                                        <TableRow key={reference._id} className="hover:bg-muted/50" style={{ minHeight: '400px' }}>
+                                            <TableCell className="min-w-[10px] max-w-[10px] p-2">
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedRecords.has(reference._id)}
@@ -366,20 +406,59 @@ export function AdultKeywordsReferencesTable() {
                                                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                 />
                                             </TableCell>
-                                            <TableCell className="min-w-[120px] md:min-w-[180px] max-w-[200px] sticky left-0 bg-background z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">
-                                                <div className="flex items-center gap-2">
-                                                    <a
-                                                        href={`http://${reference.url}`}
-                                                        target="_blank"
-                                                        className="text-blue-600 hover:underline truncate text-sm"
-                                                        title={reference.url}
-                                                    >
-                                                        {reference.url}
-                                                    </a>
-                                                    <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                            <TableCell className="min-w-[200px] md:min-w-[250px] max-w-[250px] sticky left-0 bg-background z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]">
+                                                <div className="space-y-3">
+                                                    {/* URL */}
+                                                    <div className="flex items-center gap-2">
+                                                        <a
+                                                            href={`http://${reference.url}`}
+                                                            target="_blank"
+                                                            className="text-blue-600 hover:underline truncate text-sm font-medium"
+                                                            title={reference.url}
+                                                        >
+                                                            {reference.url}
+                                                        </a>
+                                                        <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                                    </div>
+                                                    
+                                                    {/* Individual Action Buttons */}
+                                                    <div className="flex flex-col gap-2">
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            onClick={() => handleIndividualProcess(reference._id, true)}
+                                                            disabled={processingRecords.has(reference._id)}
+                                                            className="text-xs h-8"
+                                                        >
+                                                            {processingRecords.has(reference._id) ? (
+                                                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                                            ) : (
+                                                                <>
+                                                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                                                    Adult
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleIndividualProcess(reference._id, false)}
+                                                            disabled={processingRecords.has(reference._id)}
+                                                            className="text-xs h-8"
+                                                        >
+                                                            {processingRecords.has(reference._id) ? (
+                                                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                                                            ) : (
+                                                                <>
+                                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                                    Not Adult
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="min-w-[250px] md:min-w-[350px] max-w-[400px]">
+                                            <TableCell className="min-w-[250px] md:min-w-[250px] max-w-[250px]">
                                                 <div className="space-y-3">
                                                     {reference.title && (
                                                         <div>
@@ -424,23 +503,25 @@ export function AdultKeywordsReferencesTable() {
                                                     )}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="min-w-[80px] md:min-w-[100px]">
-                                                {getMatchTypeBadge(reference.match_type)}
-                                            </TableCell>
-                                            <TableCell className="min-w-[60px] md:min-w-[80px]">
-                                                {getProcessedBadge(reference.processed)}
-                                            </TableCell>
-                                            <TableCell className="min-w-[80px] md:min-w-[100px] max-w-[120px]">
-                                                <div className="flex items-center gap-1">
-                                                    <FileText className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                                                    <span className="truncate text-xs" title={reference.csv_source}>
-                                                        {reference.csv_source}
-                                                    </span>
+                                            <TableCell className="min-w-[300px] md:min-w-[400px] max-w-[400px]">
+                                                <div className="border rounded-lg overflow-hidden bg-gray-50" style={{ height: '300px' }}>
+                                                    <div className="bg-gray-100 px-3 py-2 border-b flex items-center justify-between">
+                                                        <span className="text-xs font-medium text-gray-600">Website Preview</span>
+                                                        <Eye className="h-3 w-3 text-gray-500" />
+                                                    </div>
+                                                    <iframe
+                                                        src={`http://${reference.url}`}
+                                                        className="w-full h-full border-0"
+                                                        title={`Preview of ${reference.url}`}
+                                                        sandbox="allow-scripts allow-same-origin"
+                                                        loading="lazy"
+                                                        onError={(e) => {
+                                                            console.error('Iframe load error:', e);
+                                                        }}
+                                                    />
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="min-w-[100px] md:min-w-[120px] text-sm text-muted-foreground">
-                                                {formatDate(reference.created_at)}
-                                            </TableCell>
+                                  
                                         </TableRow>
                                     ))}
                                 </TableBody>

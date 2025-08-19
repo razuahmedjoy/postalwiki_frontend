@@ -11,7 +11,6 @@ import {
     AlertTriangle, 
     CheckCircle, 
     Clock,
-    Database,
     Eye,
     RefreshCw
 } from 'lucide-react';
@@ -46,13 +45,10 @@ export function AdultKeywordsDashboard() {
     // Enable polling when processing starts
     const handleStartMatching = async () => {
         try {
-            setIsProcessing(true); // Show instant processing state
-            setIsPollingEnabled(true); // Start polling immediately
+            setIsProcessing(true);
+            setIsPollingEnabled(true);
             
-            // Start the matching process
             await startMatching.mutateAsync();
-            
-            // Force an immediate progress fetch
             await refetchProgress();
             
         } catch (error) {
@@ -67,7 +63,6 @@ export function AdultKeywordsDashboard() {
             setIsProcessing(false);
             await stopMatching.mutateAsync();
             
-            // Keep polling briefly to get final status, then stop
             setTimeout(() => {
                 setIsPollingEnabled(false);
             }, 2000);
@@ -87,7 +82,6 @@ export function AdultKeywordsDashboard() {
     // Auto-disable polling when processing completes
     useEffect(() => {
         if (progress && (progress.isComplete || !progress.isRunning)) {
-            // Stop polling after a brief delay to ensure we get final status
             const timer = setTimeout(() => {
                 setIsPollingEnabled(false);
                 setIsProcessing(false);
@@ -107,21 +101,6 @@ export function AdultKeywordsDashboard() {
             }
         }
     }, [progress]);
-
-    // Timeout mechanism to prevent stuck processes
-    useEffect(() => {
-        if (isProcessing && !isComplete) {
-            const timeout = setTimeout(() => {
-                // If processing for more than 5 minutes without completion, show warning
-                if (isProcessing && !isComplete) {
-                    console.warn('Adult keywords matching process has been running for a long time');
-                    // Optionally show a warning to the user
-                }
-            }, 5 * 60 * 1000); // 5 minutes
-
-            return () => clearTimeout(timeout);
-        }
-    }, [isProcessing, isComplete]);
 
     if (isLoading) {
         return (
@@ -162,7 +141,6 @@ export function AdultKeywordsDashboard() {
                         {stopMatching.isPending ? 'Stopping...' : 'Stop Matching'}
                     </Button>
 
-                    {/* Manual Refresh Button */}
                     <Button
                         onClick={handleManualRefresh}
                         disabled={progressLoading || isProcessing}
@@ -198,7 +176,6 @@ export function AdultKeywordsDashboard() {
                                     {progress.currentFile}
                                 </span>
                             )}
-                            {/* Polling Status Indicator */}
                             <Badge variant="outline" className="text-xs">
                                 {isPollingEnabled ? '🔄 Live Updates' : '⏸️ Updates Paused'}
                             </Badge>
@@ -221,7 +198,6 @@ export function AdultKeywordsDashboard() {
                         </div>
                     )}
 
-                    {/* Show processing indicator even when no progress data yet */}
                     {isProcessing && (!progress || progress.total === 0) && (
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
@@ -237,83 +213,7 @@ export function AdultKeywordsDashboard() {
                 </CardContent>
             </Card>
 
-            {/* Memory Status - Server Health */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Database className="h-5 w-5" />
-                        Server Memory Status
-                    </CardTitle>
-                    <CardDescription>
-                        Monitor server memory usage during processing
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-blue-600">
-                                {isProcessing ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                        <span className="text-sm">Monitoring...</span>
-                                    </div>
-                                ) : (
-                                    'N/A'
-                                )}
-                            </div>
-                            <div className="text-sm text-muted-foreground">Heap Used (MB)</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-green-600">
-                                {isProcessing ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-                                        <span className="text-sm">Monitoring...</span>
-                                    </div>
-                                ) : (
-                                    'N/A'
-                                )}
-                            </div>
-                            <div className="text-sm text-muted-foreground">Heap Total (MB)</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-purple-600">
-                                {isProcessing ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-                                        <span className="text-sm">Monitoring...</span>
-                                    </div>
-                                ) : (
-                                    'N/A'
-                                )}
-                            </div>
-                            <div className="text-sm text-muted-foreground">Memory Usage %</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">
-                                {isProcessing ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
-                                        <span className="text-sm">Monitoring...</span>
-                                    </div>
-                                ) : (
-                                    'N/A'
-                                )}
-                            </div>
-                            <div className="text-sm text-muted-foreground">RSS (MB)</div>
-                        </div>
-                    </div>
-                    {isProcessing && (
-                        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                            <div className="text-sm text-blue-800">
-                                <strong>Memory Optimization Active:</strong> Processing in small chunks with automatic garbage collection to prevent memory issues.
-                            </div>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Statistics - Live Progress Data */}
+            {/* Live Progress Statistics */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -348,7 +248,7 @@ export function AdultKeywordsDashboard() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total Records</CardTitle>
-                                <Database className="h-4 w-4 text-muted-foreground" />
+                                <FileText className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
@@ -436,7 +336,7 @@ export function AdultKeywordsDashboard() {
                 </CardContent>
             </Card>
 
-            {/* Current Progress Details */}
+            {/* Processing Summary */}
             {progress && progress.isComplete && (progress.processed > 0 || progress.errors.length > 0) && (
                 <Card>
                     <CardHeader>
