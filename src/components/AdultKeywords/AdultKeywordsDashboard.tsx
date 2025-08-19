@@ -115,8 +115,8 @@ export function AdultKeywordsDashboard() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Adult Keywords Matching</h1>
-                    <p className="text-muted-foreground">
+                    <h1 className="text-xl font-bold tracking-tight">Adult Keywords Matching</h1>
+                    <p className="text-muted-foreground text-sm">
                         Process CSV files to identify and handle adult content keywords
                     </p>
                 </div>

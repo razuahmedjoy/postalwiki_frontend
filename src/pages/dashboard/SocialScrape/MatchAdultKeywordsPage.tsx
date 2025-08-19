@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-    Activity, 
-    FileText, 
+import {
+    Activity,
+    FileText,
     Settings,
     Database,
     AlertTriangle
@@ -15,16 +15,10 @@ const MatchAdultKeywordsPage = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-4 space-y-4">
             {/* Page Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-4xl font-bold tracking-tight">Adult Keywords Management</h1>
-                    <p className="text-xl text-muted-foreground mt-2">
-                        Monitor and manage adult content keyword detection across your social scrape data
-                    </p>
-                </div>
-            </div>
+
+            <h1 className="text-2xl font-bold tracking-tight">Adult Keywords Management</h1>
 
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -35,7 +29,7 @@ const MatchAdultKeywordsPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="references" className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
-                        References
+                        Manual Review
                     </TabsTrigger>
                     <TabsTrigger value="settings" className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
