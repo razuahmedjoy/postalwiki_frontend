@@ -266,7 +266,7 @@ export function AdultKeywordsReferencesTable() {
                                     </div>
                                     
                                     {/* Action Buttons */}
-                                    <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-3 h-[200px]">
                                         <Button
                                             variant="destructive"
                                             onClick={() => handleIndividualProcess(data.references[0]._id, true)}
