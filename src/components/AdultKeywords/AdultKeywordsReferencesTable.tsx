@@ -510,7 +510,7 @@ export function AdultKeywordsReferencesTable() {
                                                         <Eye className="h-3 w-3 text-gray-500" />
                                                     </div>
                                                     <iframe
-                                                        src={`http://${reference.url}`}
+                                                        src={`https://${reference.url}`}
                                                         className="w-full h-full border-0"
                                                         title={`Preview of ${reference.url}`}
                                                         sandbox="allow-scripts allow-same-origin"
