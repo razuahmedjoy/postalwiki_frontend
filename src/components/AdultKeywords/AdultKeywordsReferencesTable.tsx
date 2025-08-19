@@ -232,15 +232,36 @@ export function AdultKeywordsReferencesTable() {
                                 {/* URL and Actions */}
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2">
-                                        <a
-                                            href={`https://${data.references[0].url}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline text-lg font-medium dark:text-blue-400"
-                                            title={data.references[0].url}
+                                        <button
+                                            onClick={() => {
+                                                const url = `https://${data.references[0].url}`;
+                                                const windowName = `website_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                                const windowFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,menubar=yes,location=yes,status=yes,left=100,top=100,popup=yes';
+                                                
+                                                // First attempt: try to open with specific features
+                                                let newWindow = window.open(url, windowName, windowFeatures);
+                                                
+                                                if (!newWindow || newWindow.closed) {
+                                                    // Second attempt: open empty window first, then navigate
+                                                    newWindow = window.open('', windowName, windowFeatures);
+                                                    if (newWindow) {
+                                                        newWindow.location.href = url;
+                                                    }
+                                                }
+                                                
+                                                // Focus the window if it was created successfully
+                                                if (newWindow && !newWindow.closed) {
+                                                    newWindow.focus();
+                                                } else {
+                                                    // Final fallback: alert user about popup blocker
+                                                    alert('Please allow popups for this site to open websites in new windows. You can enable popups in your browser settings.');
+                                                }
+                                            }}
+                                            className="text-blue-600 hover:underline text-lg font-medium dark:text-blue-400 cursor-pointer text-left"
+                                            title={`Open ${data.references[0].url} in new window`}
                                         >
                                             {data.references[0].url}
-                                        </a>
+                                        </button>
                                         <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                     </div>
                                     
