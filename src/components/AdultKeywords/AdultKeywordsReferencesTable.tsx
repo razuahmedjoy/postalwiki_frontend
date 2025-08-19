@@ -224,7 +224,7 @@ export function AdultKeywordsReferencesTable() {
 
             {/* Single Record View */}
             {data?.references && data.references.length > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-screen">
                     {/* Record Details */}
                     <Card className='col-span-1'>
                         <CardContent className="p-6">
@@ -347,7 +347,7 @@ export function AdultKeywordsReferencesTable() {
                     </Card>
 
                     {/* Website Preview */}
-                    <Card className='col-span-2'>
+                    <Card className='col-span-2 h-screen'>
                         <CardContent className="p-0">
                             <div className="border-b border-border p-4 bg-muted/50 dark:bg-muted">
                                 <div className="flex items-center justify-between">
@@ -355,10 +355,10 @@ export function AdultKeywordsReferencesTable() {
                                     <Eye className="h-4 w-4 text-muted-foreground" />
                                 </div>
                             </div>
-                            <div className="h-[600px] overflow-hidden relative">
+                            <div className="h-screen overflow-hidden relative">
                                 {/* Loading State */}
                                 {iframeLoading && (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50 dark:bg-muted z-10">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50 dark:bg-muted z-10 h-full">
                                         <div className="flex flex-col items-center gap-3">
                                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                                             <p className="text-sm text-muted-foreground">Loading website preview...</p>
