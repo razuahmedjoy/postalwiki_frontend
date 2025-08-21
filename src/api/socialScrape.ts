@@ -125,3 +125,15 @@ export const useUpdateBlacklist = () => {
         }
     });
 }; 
+
+export const useBlacklistedCount = () => {
+    return useQuery({
+        queryKey: ['blacklistedCount'],
+        queryFn: async () => {
+            const response = await axiosInstance.get('/social-scrape/blacklisted/count');
+            return response.data;
+        },
+        staleTime: 30000, // 30 seconds
+        refetchInterval: 30000, // Refetch every 30 seconds
+    });
+}; 

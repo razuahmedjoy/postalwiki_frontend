@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useUpdateBlacklist } from '@/api/socialScrape';
+import { useUpdateBlacklist, useBlacklistedCount } from '@/api/socialScrape';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield, Database } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 interface LogEntry {
     type: 'info' | 'error' | 'success';
@@ -30,7 +31,11 @@ const BlacklistProcessPage: React.FC = () => {
     const [logs, setLogs] = useState<string[]>([]);
     const [processId, setProcessId] = useState<string | null>(null);
     const updateBlacklist = useUpdateBlacklist();
+    const queryClient = useQueryClient();
     const logsEndRef = useRef<HTMLDivElement>(null);
+
+    // Get blacklisted count
+    const { data: blacklistedData, isLoading: isLoadingCount } = useBlacklistedCount();
 
     // Auto-scroll to bottom when logs update
     const scrollToBottom = () => {
@@ -74,6 +79,9 @@ const BlacklistProcessPage: React.FC = () => {
         if (progress.isComplete) {
             newLogs.push('Processing completed!');
             setIsProcessing(false);
+            
+            // Refresh the blacklisted count when processing completes
+            queryClient.invalidateQueries({ queryKey: ['blacklistedCount'] });
         }
 
         if (newLogs.length > 0) {
@@ -103,7 +111,38 @@ const BlacklistProcessPage: React.FC = () => {
     return (
         <div className="p-4 mx-auto bg-background">
             <Card className="p-6 mb-4">
-                <h2 className="text-xl font-bold mb-4">Blacklist Processing</h2>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Blacklist Processing
+                </h2>
+                
+                {/* Blacklisted Count Display */}
+                <div className="mb-4 flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Total Blacklisted Records:</span>
+                    {isLoadingCount ? (
+                        <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span className="text-sm text-muted-foreground">Loading...</span>
+                        </div>
+                    ) : blacklistedData && blacklistedData.count !== undefined ? (
+                        <Badge variant="secondary" className="text-base px-2 py-1">
+                            {blacklistedData.count.toLocaleString()}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="text-base px-2 py-1">
+                            No data
+                        </Badge>
+                    )}
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => queryClient.invalidateQueries({ queryKey: ['blacklistedCount'] })}
+                        disabled={isLoadingCount}
+                    >
+                        Refresh
+                    </Button>
+                </div>
+
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
