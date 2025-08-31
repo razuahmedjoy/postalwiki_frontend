@@ -290,7 +290,7 @@ export function BotsolListTable({ reference }: { reference: React.RefObject<HTML
                                     <TableCell className="max-w-xs truncate">
 
                                         <div className="flex gap-1">
-                                            <span>{new Date().toLocaleDateString()}</span>
+                                            <span>{new Date(item.date).toLocaleDateString()}</span>
                                         </div>
 
                                     </TableCell>

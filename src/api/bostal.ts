@@ -24,6 +24,7 @@ interface Botsol {
     // Example fields (adjust according to your actual Bostal data structure):
     company_name?: string;
     address?: string;
+    date?: string;
     postcode?: string;
     email?: string;
     meta_description?: string;
