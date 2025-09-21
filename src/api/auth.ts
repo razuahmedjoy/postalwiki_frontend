@@ -24,7 +24,9 @@ export const useLogin = () => {
 
     return useMutation({
         mutationFn: async (credentials: LoginCredentials) => {
+            
             const { data } = await axiosInstance.post<LoginResponse>('/login', credentials);
+            
             return data;
         },
         onSuccess: (data) => {

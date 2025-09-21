@@ -166,6 +166,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               onClick={handleItemClick}
             />
           </SidebarGroup>
+
+            <SidebarGroup
+            icon={<Users className="h-5 w-5" />}
+            label="Company House"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/ch-import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Import CH"
+              onClick={handleItemClick}
+            />
+            
+          </SidebarGroup>
+
           <SidebarGroup
             label="Bostal DataBase"
             defaultOpen
