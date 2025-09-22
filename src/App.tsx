@@ -28,6 +28,7 @@ import BotsolList from "./pages/dashboard/Bostal/BotsolList";
 import MatchAdultKeywordsPage from "./pages/dashboard/SocialScrape/MatchAdultKeywordsPage";
 import BlacklistUpdate from "./components/SocialScrape/BlacklistUpdate";
 import ImportCH from "./pages/dashboard/CompanyHouse/ImportCH";
+import { CompanyHouseDataPage } from "./pages/dashboard/CompanyHouse/CompanyHouseDataPage";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="social-scrape/match-adult-keywords" element={<MatchAdultKeywordsPage />} />
 
               <Route path="ch-import" element={<ImportCH />} />
+              <Route path="company-house" element={<CompanyHouseDataPage />} />
 
               <Route path="botsol">
                 <Route path="import" element={<BostalImport />} />

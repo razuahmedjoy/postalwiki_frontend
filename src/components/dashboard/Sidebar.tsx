@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload, Database } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload, Database, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -168,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
           </SidebarGroup>
 
             <SidebarGroup
-            icon={<Users className="h-5 w-5" />}
+            icon={<Building className="h-5 w-5" />}
             label="Company House"
             defaultOpen
           >
@@ -176,6 +176,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               to="/dashboard/ch-import"
               icon={<div className="h-2 w-2 rounded-full bg-current" />}
               label="Import CH"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/company-house"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Company House Data"
               onClick={handleItemClick}
             />
             
