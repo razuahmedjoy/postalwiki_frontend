@@ -43,14 +43,7 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
         useCursor: useCursorPagination ? 'true' : undefined,
     };
 
-    // Debug logging
-    console.log('Search Query:', searchQuery);
-    console.log('API Params:', queryParams);
-
     const { data, isLoading, isFetching, error } = usePaginatedCompanyHouse(queryParams);
-
-    // Debug API response
-    console.log('API Response:', { data, isLoading, isFetching, error });
 
     // Scroll to top when page or cursor changes
     useEffect(() => {
@@ -64,11 +57,6 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Search initiated with:', { 
-            company: searchCompany, 
-            number: searchNumber, 
-            postcode: searchPostcode 
-        });
         setSearchQuery({
             company: searchCompany,
             number: searchNumber,

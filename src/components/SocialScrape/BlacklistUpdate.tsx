@@ -17,11 +17,6 @@ const BlacklistUpdate: React.FC = () => {
     // Get blacklisted count
     const { data: blacklistedData, isLoading: isLoadingCount, error: countError } = useBlacklistedCount();
 
-    // Debug logging
-    console.log('Blacklisted count data:', blacklistedData);
-    console.log('Blacklisted count loading:', isLoadingCount);
-    console.log('Blacklisted count error:', countError);
-
     const { data: progress, isLoading: isLoadingProgress } = useQuery({
         queryKey: ['blacklistProgress'],
         queryFn: async () => {
@@ -43,7 +38,6 @@ const BlacklistUpdate: React.FC = () => {
     const testApiCall = async () => {
         try {
             const response = await axiosInstance.get('/social-scrape/blacklisted/count');
-            console.log('Manual API test response:', response);
             alert(`API Response: ${JSON.stringify(response.data)}`);
         } catch (error) {
             console.error('Manual API test error:', error);
