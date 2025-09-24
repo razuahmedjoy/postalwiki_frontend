@@ -282,17 +282,27 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
 
     // Memoize address formatting function
     const formatAddress = useCallback((regAddress: any) => {
-        if (!regAddress) return null;
+        if (!regAddress) {
+            // Return all address keys with empty values if no address data
+            return [
+                { label: 'Address Line 1', value: '' },
+                { label: 'Address Line 2', value: '' },
+                { label: 'Post Town', value: '' },
+                { label: 'County', value: '' },
+                { label: 'Post Code', value: '' }
+            ];
+        }
         
+        // Return all address components, including empty ones
         const addressComponents = [
-            { label: 'Address Line 1', value: regAddress.AddressLine1 },
-            { label: 'Address Line 2', value: regAddress.AddressLine2 },
-            { label: 'Post Town', value: regAddress.PostTown },
-            { label: 'County', value: regAddress.County },
-            { label: 'Post Code', value: regAddress.PostCode }
-        ].filter(component => component.value && component.value.trim() !== '');
+            { label: 'Address Line 1', value: regAddress.AddressLine1 || '' },
+            { label: 'Address Line 2', value: regAddress.AddressLine2 || '' },
+            { label: 'Post Town', value: regAddress.PostTown || '' },
+            { label: 'County', value: regAddress.County || '' },
+            { label: 'Post Code', value: regAddress.PostCode || '' }
+        ];
         
-        return addressComponents.length > 0 ? addressComponents : null;
+        return addressComponents;
     }, []);
 
     // Memoize status badge color logic
@@ -337,24 +347,24 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
                     </div>
                 )}
                 
-                {formatAddress(item.RegAddress) && (
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Address:</span>
-                        </div>
-                        <div className="ml-6 space-y-1">
-                            {formatAddress(item.RegAddress)!.map((component, index) => (
-                                <div key={index} className="text-sm">
-                                    <span className="font-medium text-muted-foreground">
-                                        {component.label}:
-                                    </span>{' '}
-                                    <span>{component.value}</span>
-                                </div>
-                            ))}
-                        </div>
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Address:</span>
                     </div>
-                )}
+                    <div className="ml-6 space-y-1">
+                        {formatAddress(item.RegAddress).map((component, index) => (
+                            <div key={index} className="text-sm">
+                                <span className="font-medium text-muted-foreground">
+                                    {component.label}:
+                                </span>{' '}
+                                <span className={component.value ? '' : 'text-muted-foreground italic'}>
+                                    {component.value || 'N/A'}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </CardContent>
         </Card>
     ), [formatAddress, getStatusBadgeVariant]);
@@ -543,20 +553,20 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
                                                 </TableCell>
                                                 <TableCell className="p-3">
                                                     <div className="text-xs space-y-0.5">
-                                                        {formatAddress(item.RegAddress) ? (
-                                                            formatAddress(item.RegAddress)!.map((component, index) => (
-                                                                <div key={index} className="flex flex-col sm:flex-row sm:gap-1">
-                                                                    <span className="font-medium text-muted-foreground whitespace-nowrap text-[10px] sm:text-xs">
-                                                                        {component.label}:
-                                                                    </span>
-                                                                    <span className="text-foreground break-words text-[10px] sm:text-xs">
-                                                                        {component.value}
-                                                                    </span>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <span className="text-muted-foreground">N/A</span>
-                                                        )}
+                                                        {formatAddress(item.RegAddress).map((component, index) => (
+                                                            <div key={index} className="flex flex-col sm:flex-row sm:gap-1">
+                                                                <span className="font-medium text-muted-foreground whitespace-nowrap text-[10px] sm:text-xs">
+                                                                    {component.label}:
+                                                                </span>
+                                                                <span className={`break-words text-[10px] sm:text-xs ${
+                                                                    component.value 
+                                                                        ? 'text-foreground' 
+                                                                        : 'text-muted-foreground italic'
+                                                                }`}>
+                                                                    {component.value || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="p-3">
