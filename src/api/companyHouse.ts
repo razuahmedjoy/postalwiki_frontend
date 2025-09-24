@@ -25,11 +25,10 @@ interface CompanyHouse {
 		AddressLine2?: string;
 		PostTown?: string;
 		PostCode?: string;
+		County?: string;
 	};
 	CompanyStatus?: string;
 	IncorporationDate?: string;
-	date: string;
-	is_blacklisted?: boolean;
 	fullAddress?: string;
 	createdAt?: string;
 	updatedAt?: string;
@@ -168,6 +167,30 @@ export const useCompanyHouseByNumber = (companyNumber: string) => {
 		enabled: !!companyNumber,
 		staleTime: 5 * 60 * 1000,
 		gcTime: 10 * 60 * 1000,
+	});
+};
+
+// Delete all CompanyHouse data
+export const deleteAllCompanyHouseData = async () => {
+	const { data } = await axiosInstance.delete('/company-house/delete-all', {
+		data: { confirm: 'DELETE_ALL_COMPANY_HOUSE_DATA' }
+	});
+	return data;
+};
+
+export const useDeleteAllCompanyHouseData = () => {
+	const queryClient = useQueryClient();
+	
+	return useMutation({
+		mutationFn: deleteAllCompanyHouseData,
+		onSuccess: (data) => {
+			// Invalidate and refetch all CompanyHouse related queries
+			queryClient.invalidateQueries({ queryKey: ['company-house'] });
+			queryClient.invalidateQueries({ queryKey: ['company-house-stats'] });
+		},
+		onError: (error: any) => {
+			console.error('Failed to delete all CompanyHouse data:', error);
+		},
 	});
 };
 
