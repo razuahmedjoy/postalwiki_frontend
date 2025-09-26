@@ -234,7 +234,7 @@ export function BotsolListTable({ reference }: { reference: React.RefObject<HTML
     return (
         <div className="container mx-auto py-2">
             <div className="mb-6 flex justify-between w-full">
-                <h1 className="text-xl font-bold mb-3">Social Media Scrape Data jho</h1>
+                <h1 className="text-xl font-bold mb-3">Botsol List</h1>
 
                 <form onSubmit={handleSearch} className="flex gap-4">
                     <Input
