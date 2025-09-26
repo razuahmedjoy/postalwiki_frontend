@@ -167,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
             />
           </SidebarGroup>
 
-            <SidebarGroup
+          <SidebarGroup
             icon={<Building className="h-5 w-5" />}
             label="Company House"
             defaultOpen
@@ -184,7 +184,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Company House Data"
               onClick={handleItemClick}
             />
-            
+          </SidebarGroup>
+
+          <SidebarGroup
+            icon={<Database className="h-5 w-5" />}
+            label="Address Master"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/address-master-import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Import Address Master"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/address-master"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Address Master Data"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
 
           <SidebarGroup

@@ -29,6 +29,8 @@ import MatchAdultKeywordsPage from "./pages/dashboard/SocialScrape/MatchAdultKey
 import BlacklistUpdate from "./components/SocialScrape/BlacklistUpdate";
 import ImportCH from "./pages/dashboard/CompanyHouse/ImportCH";
 import { CompanyHouseDataPage } from "./pages/dashboard/CompanyHouse/CompanyHouseDataPage";
+import ImportAddressMaster from "./pages/dashboard/AddressMaster/ImportAddressMaster";
+import SearchAddressMaster from "./pages/dashboard/AddressMaster/SearchAddressMaster";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -72,6 +74,9 @@ const App = () => (
 
               <Route path="ch-import" element={<ImportCH />} />
               <Route path="company-house" element={<CompanyHouseDataPage />} />
+
+              <Route path="address-master-import" element={<ImportAddressMaster />} />
+              <Route path="address-master" element={<SearchAddressMaster />} />
 
               <Route path="botsol">
                 <Route path="import" element={<BostalImport />} />
