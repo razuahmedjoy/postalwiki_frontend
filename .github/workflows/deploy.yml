@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -14,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -22,33 +23,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: List build files
-        run: |
-          echo "Contents of dist directory:"
-          ls -la dist/
-          echo "Total files in dist:"
-          find dist -type f | wc -l
-
-
-      - name: Deploy to server
+      - name: Upload dist
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 1337
+          port: 22
           source: "dist/."
-          target: "/home/lysnar/admin.postalwiki.co.uk"
+          target: "/home/dev/admin.socialwiki.co.uk"
           strip_components: 1
-
-      - name: Set permissions and restart Apache
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 1337
-          script: |
-            sudo chown -R lysnar:nobody /home/lysnar/admin.postalwiki.co.uk
-            sudo chmod -R 775 /home/lysnar/admin.postalwiki.co.uk
-            sudo /usr/local/apache/bin/apachectl graceful
