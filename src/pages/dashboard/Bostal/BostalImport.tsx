@@ -31,7 +31,7 @@ const BostalImport = () => {
                     type: 'success',
                     message: 'Starting Bostal import process...'
                 });
-            },
+            }, 
             onError: (error: any) => {
                 addLog({
                     type: 'error',
