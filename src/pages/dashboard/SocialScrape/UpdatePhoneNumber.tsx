@@ -1,4 +1,5 @@
 import { axiosInstance } from '@/lib/axios';
+import { CSV_UPLOAD_PATHS } from '@/lib/constant';
 import React, { useState, useEffect } from 'react';
 
 interface PhoneProgress {
@@ -127,7 +128,7 @@ const UpdatePhoneNumberPage = () => {
 
             <div className="mb-6">
                 <p className="text-gray-600 dark:text-gray-200 mb-2">
-                    This process will read CSV files from the <code className="bg-gray-600 text-white px-1 rounded">imports/social_scrape_phone</code> directory 
+                    This process will read CSV files from the <code className="bg-gray-600 text-white px-1 rounded">{CSV_UPLOAD_PATHS.SOCIAL_SCRAPE_UPDATE_PHONE_NUMBER}</code> directory 
                     and update phone numbers for existing records or create new records with phone numbers.
                 </p>
                 <p className="text-gray-400">

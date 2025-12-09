@@ -3,6 +3,7 @@ import { useBostalStats, useBostalImport } from '@/api/bostal';
 import { useImportProgress } from '@/hooks/useImportProgress';
 import { toast } from 'sonner';
 import { ImportProgress, ImportButton, FileUploadInstructions } from '@/components/Bostal';
+import { CSV_UPLOAD_PATHS } from '@/lib/constant';
 
 const BostalImport = () => {
     const { data: stats, isLoading: isLoadingStats } = useBostalStats();
@@ -48,7 +49,7 @@ const BostalImport = () => {
             </h2>
 
             <FileUploadInstructions
-                uploadPath="/home/dev/api.socialwiki.co.uk/deploy/imports/botsol/"
+                uploadPath={CSV_UPLOAD_PATHS.BOTSOL_IMPORTS}
                 formatDescription="Make sure each file has the correct column format for Bostal data."
                 additionalInfo="Please ensure your CSV files contain the appropriate columns for Bostal data. The exact column structure should match your backend import requirements."
             />
