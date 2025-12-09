@@ -175,7 +175,7 @@ const ImportCH: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4">Company House Import - {isLoadingStats ? 'Loading...' : stats?.toLocaleString()}</h2>
 
             <div className="mb-6">
-                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">home/lysnar/api.postalwiki.co.uk/imports/company_house/</span></p>
+                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">/home/dev/api.socialwiki.co.uk/deploy/imports/company_house/</span></p>
                 <p>Make sure each file has the expected columns for company house import.</p>
             </div>
 

@@ -48,7 +48,7 @@ const BostalImport = () => {
             </h2>
 
             <FileUploadInstructions
-                uploadPath="home/lysnar/api.postalwiki.co.uk/imports/botsol/"
+                uploadPath="/home/dev/api.socialwiki.co.uk/deploy/imports/botsol/"
                 formatDescription="Make sure each file has the correct column format for Bostal data."
                 additionalInfo="Please ensure your CSV files contain the appropriate columns for Bostal data. The exact column structure should match your backend import requirements."
             />
