@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useCompanyHouseStats, useCompanyHouseImport } from '@/api/companyHouse';
 import { toast } from 'sonner';
 import { axiosInstance } from '@/lib/axios';
+import { CSV_UPLOAD_PATHS } from '@/lib/constant';
 
 interface ProgressData {
     currentFile: string | null;
@@ -175,7 +176,7 @@ const ImportCH: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4">Company House Import - {isLoadingStats ? 'Loading...' : stats?.toLocaleString()}</h2>
 
             <div className="mb-6">
-                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">home/lysnar/api.postalwiki.co.uk/imports/company_house/</span></p>
+                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">{CSV_UPLOAD_PATHS.COMPANY_HOUSE_IMPORTS}</span></p>
                 <p>Make sure each file has the expected columns for company house import.</p>
             </div>
 

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { AdultKeywordsDashboard } from '@/components/AdultKeywords/AdultKeywordsDashboard';
 import { AdultKeywordsReferencesTable } from '@/components/AdultKeywords/AdultKeywordsReferencesTable';
+import { CSV_UPLOAD_PATHS } from '@/lib/constant';
 
 const MatchAdultKeywordsPage = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -70,8 +71,8 @@ const MatchAdultKeywordsPage = () => {
                                         <p className="text-sm text-muted-foreground mb-2">
                                             CSV files should be placed in:
                                         </p>
-                                        <code className="block bg-muted p-2 rounded text-sm font-mono">
-                                            server/update/social_scrape/match_adult_keywords/
+                                        <code className="block bg-muted p-2 rounded text-sm font-mono break-words whitespace-normal">
+                                            {CSV_UPLOAD_PATHS.SOCIAL_SCRAPE_MATCH_ADULT_KEYWORDS}
                                         </code>
                                         <p className="text-sm text-muted-foreground mt-2">
                                             Files will be automatically moved to a completed folder after processing.

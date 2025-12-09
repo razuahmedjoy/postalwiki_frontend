@@ -4,6 +4,7 @@ import { useSocialScrapeStats, useSocialScrapeImport } from '@/api/socialScrape'
 import { toast } from 'sonner';
 import { axiosInstance } from '@/lib/axios';
 import socialScrapeCSVFormatImage from '@/assets/images/social_scrape/social_scrape_csv_format.jpg';
+import { CSV_UPLOAD_PATHS } from '@/lib/constant';
 
 interface ProgressData {
     currentFile: string | null;
@@ -173,7 +174,7 @@ const SocialScrapeImport: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4">Social Scrape Import - {isLoadingStats ? 'Loading...' : stats?.toLocaleString()}</h2>
 
             <div className="mb-6">
-                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">home/lysnar/api.postalwiki.co.uk/imports/social_scrape/</span></p>
+                <p>Upload CSV files to the server in <span className="font-bold dark:bg-black p-1 text-sm">{CSV_UPLOAD_PATHS.IMPORTS_SOCIAL_SCRAPE}</span></p>
                 <p>Make sure to each file should have columns in the following order:</p>
                 <p>URL,CODE,RESULT,DATE</p>
                 <img src={socialScrapeCSVFormatImage} alt="Social Scrape CSV Format" className='w-1/3' />
