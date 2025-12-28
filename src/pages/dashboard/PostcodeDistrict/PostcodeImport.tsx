@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { usePostcodeImportStart, usePostcodeUpload, usePostcodeImportStatus } from '@/api/postcodeDistrict';
 import { Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import exampleImage from '@/assets/images/postcode_districts/csv_format.png';
 
 const PostcodeImport: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
@@ -103,6 +104,32 @@ const PostcodeImport: React.FC = () => {
                     <CardDescription>Upload a CSV file containing Postcode and District columns.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+
+                    {/* Format Guide */}
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800 space-y-3">
+                        <div className="flex items-start gap-4">
+                            <div className="flex-1">
+                                <h3 className="text-sm font-semibold mb-2">CSV Format Requirements</h3>
+                                <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
+                                    <li>File type must be <strong>.csv</strong></li>
+                                    <li>Columns: <strong>District Name</strong>, <strong>Postcode</strong></li>
+                                    <li>Order: First column is District, second is Postcode</li>
+                                    <li>Headers are optional (system auto-detects)</li>
+                                    <li>Max file size: <strong>20MB</strong></li>
+                                </ul>
+                            </div>
+                            <div className="flex-none">
+                                <h3 className="text-sm font-semibold mb-2">Example Format</h3>
+                                <div className="border rounded-md overflow-hidden shadow-sm">
+                                    <img
+                                        src={exampleImage}
+                                        alt="CSV Example Format"
+                                        className="max-h-24 w-auto object-contain"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* File Input */}
                     <div className="flex items-center gap-4">
