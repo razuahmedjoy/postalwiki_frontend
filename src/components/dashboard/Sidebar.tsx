@@ -167,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
             />
           </SidebarGroup>
 
-            <SidebarGroup
+          <SidebarGroup
             icon={<Building className="h-5 w-5" />}
             label="Company House"
             defaultOpen
@@ -184,7 +184,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="Company House Data"
               onClick={handleItemClick}
             />
-            
+
+          </SidebarGroup>
+
+          <SidebarGroup
+            icon={<div className="h-5 w-5" />} // Placeholder or MapIcon
+            label="PostCode Districts"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/postcode-district/import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Import PostCode Districts"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/postcode-district/search"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="PostCodeDistrict Search"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
 
           <SidebarGroup

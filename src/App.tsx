@@ -29,6 +29,8 @@ import MatchAdultKeywordsPage from "./pages/dashboard/SocialScrape/MatchAdultKey
 import BlacklistUpdate from "./components/SocialScrape/BlacklistUpdate";
 import ImportCH from "./pages/dashboard/CompanyHouse/ImportCH";
 import { CompanyHouseDataPage } from "./pages/dashboard/CompanyHouse/CompanyHouseDataPage";
+import PostcodeImport from "./pages/dashboard/PostcodeDistrict/PostcodeImport";
+import PostcodeSearch from "./pages/dashboard/PostcodeDistrict/PostcodeSearch";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -72,6 +74,11 @@ const App = () => (
 
               <Route path="ch-import" element={<ImportCH />} />
               <Route path="company-house" element={<CompanyHouseDataPage />} />
+
+              <Route path="postcode-district">
+                <Route path="import" element={<PostcodeImport />} />
+                <Route path="search" element={<PostcodeSearch />} />
+              </Route>
 
               <Route path="botsol">
                 <Route path="import" element={<BostalImport />} />
