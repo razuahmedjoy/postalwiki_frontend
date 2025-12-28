@@ -79,7 +79,7 @@ export const usePaginatedAdultKeywordsReferences = (page: number = 1, limit: num
             const params: Record<string, string | number | boolean> = { page, limit };
             if (matchType) params.matchType = matchType;
             if (processed !== undefined) params.processed = processed;
-            
+
             const { data } = await axiosInstance.get<PaginatedReferencesResponse>('/adult-keywords/references/paginated', {
                 params,
             });
@@ -95,7 +95,7 @@ export const usePaginatedAdultKeywordsReferences = (page: number = 1, limit: num
 
 export const useStartAdultKeywordsMatching = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (): Promise<StartMatchingResponse> => {
             const { data } = await axiosInstance.post<StartMatchingResponse>('/adult-keywords/start-matching');
@@ -105,7 +105,7 @@ export const useStartAdultKeywordsMatching = () => {
             // Invalidate and refetch progress and stats
             queryClient.invalidateQueries({ queryKey: ['adult-keywords-progress'] });
             queryClient.invalidateQueries({ queryKey: ['adult-keywords-stats'] });
-            
+
             // Trigger a one-time fetch to get initial progress
             queryClient.refetchQueries({ queryKey: ['adult-keywords-progress'] });
         },
@@ -117,7 +117,7 @@ export const useStartAdultKeywordsMatching = () => {
 
 export const useStopAdultKeywordsMatching = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (): Promise<StopMatchingResponse> => {
             const { data } = await axiosInstance.post<StopMatchingResponse>('/adult-keywords/stop-matching');
@@ -127,7 +127,7 @@ export const useStopAdultKeywordsMatching = () => {
             // Invalidate and refetch progress and stats
             queryClient.invalidateQueries({ queryKey: ['adult-keywords-progress'] });
             queryClient.invalidateQueries({ queryKey: ['adult-keywords-stats'] });
-            
+
             // Trigger a one-time fetch to get final progress
             queryClient.refetchQueries({ queryKey: ['adult-keywords-progress'] });
         },
@@ -137,9 +137,20 @@ export const useStopAdultKeywordsMatching = () => {
     });
 };
 
+export const translateText = async (text: string) => {
+    const { data } = await axiosInstance.post<{ success: boolean; translated: string; detectedLang: string }>('/adult-keywords/translate', { text });
+    return data;
+};
+
+export const useTranslate = () => {
+    return useMutation({
+        mutationFn: translateText
+    });
+};
+
 export const useBulkProcessReferences = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async ({ recordIds, isAdultContent }: { recordIds: string[], isAdultContent: boolean }) => {
             const { data } = await axiosInstance.post('/adult-keywords/references/bulk-process', {
@@ -174,11 +185,11 @@ export const getStatusText = (progress: AdultKeywordsProgress): string => {
         }
         return 'Starting...';
     }
-    
+
     if (progress.isComplete) {
         return 'Completed';
     }
-    
+
     return 'Idle';
 };
 

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
     Pagination,
     PaginationContent,
@@ -19,15 +19,15 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import { 
-    CheckCircle, 
+import {
+    CheckCircle,
     ExternalLink,
     FileText,
     AlertTriangle,
     Eye,
     Loader2
 } from 'lucide-react';
-import { usePaginatedAdultKeywordsReferences, useBulkProcessReferences } from '@/api/adultKeywords';
+import { usePaginatedAdultKeywordsReferences, useBulkProcessReferences, useTranslate } from '@/api/adultKeywords';
 import { useEffect } from 'react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -40,43 +40,121 @@ export function AdultKeywordsReferencesTable() {
     const [processingRecords, setProcessingRecords] = useState<Set<string>>(new Set());
     const [iframeLoading, setIframeLoading] = useState(true);
 
+    // Translation state
+    const [translations, setTranslations] = useState<{
+        title?: string;
+        description?: string;
+        keywords?: string;
+    }>({});
+    const [isTranslating, setIsTranslating] = useState(false);
+
     const { data, isLoading, isFetching, refetch } = usePaginatedAdultKeywordsReferences(
-        page, 
-        limit, 
-        matchType === 'all' ? undefined : matchType, 
+        page,
+        limit,
+        matchType === 'all' ? undefined : matchType,
         processed
     );
 
     const bulkProcessMutation = useBulkProcessReferences();
+    const translateMutation = useTranslate();
 
     // Reset iframe loading when page changes or data changes
     useEffect(() => {
         setIframeLoading(true);
     }, [page, data?.references]);
 
+    // Handle Translation
+    useEffect(() => {
+        const currentRecord = data?.references?.[0];
+        if (!currentRecord) {
+            setTranslations({});
+            return;
+        }
+
+        const fetchTranslations = async () => {
+            // Avoid race conditions or unnecessary calls if we already have data for this ID (optional, but good)
+            // For now, just reset and fetch.
+            setIsTranslating(true);
+            setTranslations({}); // Clear previous
+
+            const newTranslations: { title?: string; description?: string; keywords?: string } = {};
+
+            try {
+                const promises = [];
+
+                if (currentRecord.title) {
+                    promises.push(
+                        translateMutation.mutateAsync(currentRecord.title)
+                            .then(res => {
+                                if (res.success && res.detectedLang !== 'en') {
+                                    newTranslations.title = res.translated;
+                                }
+                            })
+                            .catch(() => { })
+                    );
+                }
+
+                if (currentRecord.meta_description) {
+                    promises.push(
+                        translateMutation.mutateAsync(currentRecord.meta_description)
+                            .then(res => {
+                                if (res.success && res.detectedLang !== 'en') {
+                                    newTranslations.description = res.translated;
+                                }
+                            })
+                            .catch(() => { })
+                    );
+                }
+
+                if (currentRecord.keywords) {
+                    promises.push(
+                        translateMutation.mutateAsync(currentRecord.keywords)
+                            .then(res => {
+                                if (res.success && res.detectedLang !== 'en') {
+                                    newTranslations.keywords = res.translated;
+                                }
+                            })
+                            .catch(() => { })
+                    );
+                }
+
+                await Promise.all(promises);
+                setTranslations(newTranslations);
+
+            } catch (error) {
+                console.error("Translation error", error);
+            } finally {
+                setIsTranslating(false);
+            }
+        };
+
+        fetchTranslations();
+
+    }, [data?.references?.[0]?._id]); // Effect depends on Record ID
+
     // Individual record processing
     const handleIndividualProcess = async (recordId: string, isAdultContent: boolean) => {
         if (processingRecords.has(recordId)) return;
-        
+
         setProcessingRecords(prev => new Set(prev).add(recordId));
-        
+
         try {
-            const result = await bulkProcessMutation.mutateAsync({ 
-                recordIds: [recordId], 
-                isAdultContent 
+            const result = await bulkProcessMutation.mutateAsync({
+                recordIds: [recordId],
+                isAdultContent
             });
-            
+
             // Show success message
             setSuccessMessage(result.message);
-            
+
             // Refresh data to show updated status
             refetch();
-            
+
             // Clear success message after 5 seconds
             setTimeout(() => {
                 setSuccessMessage('');
             }, 5000);
-            
+
         } catch (error) {
             console.error(`Failed to process record ${recordId}:`, error);
             setSuccessMessage(`Error: Failed to process record. Please try again.`);
@@ -151,18 +229,18 @@ export function AdultKeywordsReferencesTable() {
                     )}
                 </div>
             )}
-               {/* Pagination */}
+            {/* Pagination */}
             {data && data.pagination.pages > 1 && (
                 <div className="overflow-x-auto">
                     <Pagination>
                         <PaginationContent className="flex-wrap justify-center">
                             <PaginationItem>
-                                <PaginationPrevious 
+                                <PaginationPrevious
                                     onClick={() => setPage(page - 1)}
                                     className={page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                                 />
                             </PaginationItem>
-                            
+
                             {/* Show fewer page numbers on mobile */}
                             {Array.from({ length: Math.min(5, data.pagination.pages) }, (_, i) => {
                                 const pageNum = i + 1;
@@ -178,7 +256,7 @@ export function AdultKeywordsReferencesTable() {
                                     </PaginationItem>
                                 );
                             })}
-                            
+
                             {data.pagination.pages > 5 && (
                                 <>
                                     {page > 3 && <PaginationItem><span className="px-2">...</span></PaginationItem>}
@@ -199,9 +277,9 @@ export function AdultKeywordsReferencesTable() {
                                     )}
                                 </>
                             )}
-                            
+
                             <PaginationItem>
-                                <PaginationNext 
+                                <PaginationNext
                                     onClick={() => setPage(page + 1)}
                                     className={page >= data.pagination.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                                 />
@@ -237,10 +315,10 @@ export function AdultKeywordsReferencesTable() {
                                                 const url = `https://${data.references[0].url}`;
                                                 const windowName = `website_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                                                 const windowFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,menubar=yes,location=yes,status=yes,left=100,top=100,popup=yes';
-                                                
+
                                                 // First attempt: try to open with specific features
                                                 let newWindow = window.open(url, windowName, windowFeatures);
-                                                
+
                                                 if (!newWindow || newWindow.closed) {
                                                     // Second attempt: open empty window first, then navigate
                                                     newWindow = window.open('', windowName, windowFeatures);
@@ -248,7 +326,7 @@ export function AdultKeywordsReferencesTable() {
                                                         newWindow.location.href = url;
                                                     }
                                                 }
-                                                
+
                                                 // Focus the window if it was created successfully
                                                 if (newWindow && !newWindow.closed) {
                                                     newWindow.focus();
@@ -264,7 +342,7 @@ export function AdultKeywordsReferencesTable() {
                                         </button>
                                         <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                     </div>
-                                    
+
                                     {/* Action Buttons */}
                                     <div className="flex flex-col gap-3 h-[200px]">
                                         <Button
@@ -302,35 +380,56 @@ export function AdultKeywordsReferencesTable() {
 
                                 {/* Content Details */}
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold text-foreground">Content Details</h3>
-                                    
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-semibold text-foreground">Content Details</h3>
+                                        {isTranslating && <span className="text-xs text-muted-foreground animate-pulse">Translating...</span>}
+                                    </div>
+
                                     {data.references[0].title && (
                                         <div>
                                             <div className="text-sm font-medium text-muted-foreground mb-2">Title:</div>
                                             <div className="text-sm leading-relaxed break-words whitespace-pre-wrap p-3 bg-muted/50 dark:bg-muted rounded border text-foreground">
                                                 {data.references[0].title}
                                             </div>
+                                            {translations.title && (
+                                                <div className="mt-2 p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded border border-blue-100 dark:border-blue-900">
+                                                    <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">Translated (EN):</div>
+                                                    <div className="text-sm text-foreground">{translations.title}</div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
-                                    
+
                                     {data.references[0].meta_description && (
                                         <div>
                                             <div className="text-sm font-medium text-muted-foreground mb-2">Description:</div>
                                             <div className="text-sm leading-relaxed break-words whitespace-pre-wrap p-3 bg-muted/50 dark:bg-muted rounded border text-foreground">
                                                 {data.references[0].meta_description}
                                             </div>
+                                            {translations.description && (
+                                                <div className="mt-2 p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded border border-blue-100 dark:border-blue-900">
+                                                    <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">Translated (EN):</div>
+                                                    <div className="text-sm text-foreground">{translations.description}</div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
-                                    
+
                                     {data.references[0].keywords && (
                                         <div>
                                             <div className="text-sm font-medium text-muted-foreground mb-2">Keywords:</div>
                                             <div className="text-sm leading-relaxed break-words whitespace-pre-wrap p-3 bg-muted/50 dark:bg-muted rounded border text-foreground">
                                                 {data.references[0].keywords}
                                             </div>
+                                            {translations.keywords && (
+                                                <div className="mt-2 p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded border border-blue-100 dark:border-blue-900">
+                                                    <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">Translated (EN):</div>
+                                                    <div className="text-sm text-foreground">{translations.keywords}</div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
-                                    
+
                                     {!data.references[0].title && !data.references[0].meta_description && !data.references[0].keywords && (
                                         <div className="text-sm text-muted-foreground italic p-3 bg-muted/50 dark:bg-muted rounded border">No content data</div>
                                     )}
@@ -386,7 +485,7 @@ export function AdultKeywordsReferencesTable() {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 <iframe
                                     src={`https://${data.references[0].url}`}
                                     className="w-full h-full border-0"
@@ -402,7 +501,7 @@ export function AdultKeywordsReferencesTable() {
                 </div>
             )}
 
-         
+
             {/* No Results */}
             {data && data.references.length === 0 && (
                 <Card>
