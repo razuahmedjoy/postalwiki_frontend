@@ -12,7 +12,7 @@ interface ImportJobStatus {
     status: 'pending' | 'processing' | 'completed' | 'failed';
     totalProcessed: number;
     insertedCount: number;
-    errors: number;
+    errorCount: number;
     errorLogs: string[];
     createdAt: string;
 }

@@ -184,7 +184,7 @@ const PostcodeImport: React.FC = () => {
                                         <div className="text-xs text-muted-foreground">Inserted</div>
                                     </div>
                                     <div className="bg-background p-3 rounded-md border">
-                                        <div className="text-2xl font-bold text-red-500">{stats.errors.toLocaleString()}</div>
+                                        <div className="text-2xl font-bold text-red-500">{stats.errorCount.toLocaleString()}</div>
                                         <div className="text-xs text-muted-foreground">Errors</div>
                                     </div>
                                     <div className="bg-background p-3 rounded-md border">
