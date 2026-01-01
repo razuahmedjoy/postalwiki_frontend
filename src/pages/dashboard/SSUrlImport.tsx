@@ -153,9 +153,9 @@ const SSUrlImport: React.FC = () => {
                 }
 
                 const data = results.data.filter(row => row.url && row.image);
-                const entriesPerChunk = 200;
+                const entriesPerChunk = 300;
                 const chunks: CSVRow[][] = [];
-                const CONCURRENT_CHUNKS = 10; // Number of chunks to process simultaneously
+                const CONCURRENT_CHUNKS = 3; // Reduced for production stability
 
                 // Split into chunks
                 for (let i = 0; i < data.length; i += entriesPerChunk) {
@@ -170,15 +170,25 @@ const SSUrlImport: React.FC = () => {
                     try {
                         addLog(`Processing chunk #${index + 1}...`);
                         const result = await importMutation.mutateAsync({ chunk, bucketName });
-                        addLog(`Chunk #${index + 1} completed. Success: ${result.success}, Errors: ${result.errors}, Not Found: ${result.notfound}`);
+                        // Add duplicate info to log if available
+                        const duplicateMsg = result.duplicates ? `, Duplicates: ${result.duplicates}` : '';
+                        addLog(`Chunk #${index + 1} completed. Success: ${result.success}, Errors: ${result.errors}, Not Found: ${result.notfound}${duplicateMsg}`);
                         return result;
-                    } catch (error) {
-                        if (retryCount < 2) {
-                            addLog(`Chunk #${index + 1} failed. Retrying (${retryCount + 1}/2)...`);
-                            await new Promise(resolve => setTimeout(resolve, 1000));
+                    } catch (error: any) {
+                        const errorMessage = error?.response?.data?.errormessages || error.message || String(error);
+
+                        // Retry on timeout or 5xx errors
+                        if (retryCount < 3) {
+                            // Check if it's a timeout (often 504) or network error
+                            const isTimeout = errorMessage.includes('timeout') || error?.response?.status === 504;
+
+                            addLog(`Chunk #${index + 1} failed${isTimeout ? ' (Timeout)' : ''}. Retrying (${retryCount + 1}/3)...`);
+
+                            // Exponential backoff for chunk retry
+                            await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1)));
                             return processChunkWithRetry(chunk, index, retryCount + 1);
                         } else {
-                            addErrorLog(`Chunk #${index + 1} failed after 2 retries: ${error instanceof Error ? error.message : String(error)}`);
+                            addErrorLog(`Chunk #${index + 1} failed after 3 retries: ${errorMessage}`);
                             throw error;
                         }
                     }
@@ -201,10 +211,10 @@ const SSUrlImport: React.FC = () => {
                         const batch = chunks.slice(i, i + CONCURRENT_CHUNKS);
                         const promises = batch.map((_, index) => processChunk(i + index));
                         await Promise.all(promises);
-                        
+
                         // Small delay between batches to prevent overwhelming the server
                         if (i + CONCURRENT_CHUNKS < chunks.length) {
-                            await new Promise(resolve => setTimeout(resolve, 200));
+                            await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay slightly
                         }
                     }
                 };
@@ -232,7 +242,7 @@ const SSUrlImport: React.FC = () => {
 
     return (
         <div className="space-y-6 p-4">
-      
+
 
             <Card className="p-6 space-y-6 shadow-md">
                 <div>
@@ -292,7 +302,7 @@ const SSUrlImport: React.FC = () => {
                             <h3 className="text-md font-medium mb-2">Import Statistics</h3>
                             <div className="grid grid-cols-2 gap-2">
 
-                                
+
                                 <div className="bg-muted rounded-md p-2 col-span-2">
                                     <p className="text-sm text-muted-foreground">Existing Records</p>
                                     <p className="text-xl font-bold">{data?.totalCount.toLocaleString()}</p>
