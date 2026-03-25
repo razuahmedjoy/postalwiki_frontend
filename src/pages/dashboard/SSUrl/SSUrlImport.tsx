@@ -32,7 +32,8 @@ const SSUrlImport: React.FC = () => {
         total: 0,
         success: 0,
         errors: 0,
-        notFound: 0
+        notFound: 0,
+        duplicates: 0
     });
     const logsEndRef = useRef<HTMLDivElement>(null);
     const errorLogsEndRef = useRef<HTMLDivElement>(null);
@@ -74,13 +75,15 @@ const SSUrlImport: React.FC = () => {
                     total: prev.total + data.totalcount,
                     success: prev.success + data.success,
                     errors: prev.errors + data.errors,
-                    notFound: prev.notFound + data.notfound
+                    notFound: prev.notFound + data.notfound,
+                    duplicates: prev.duplicates + (data.duplicates || 0)
                 };
 
                 // Show toast with updated stats
+                const duplicateText = data.duplicates ? `, ${data.duplicates} duplicates` : '';
                 toast({
                     title: "Import completed",
-                    description: `Processed ${newStats.total} entries with ${newStats.success} successful inserts and ${newStats.errors} errors.`
+                    description: `Processed ${newStats.total} entries: ${newStats.success} inserted, ${newStats.errors} errors, ${newStats.notFound} not found${duplicateText}.`
                 });
 
                 return newStats;
@@ -139,7 +142,8 @@ const SSUrlImport: React.FC = () => {
             total: 0,
             success: 0,
             errors: 0,
-            notFound: 0
+            notFound: 0,
+            duplicates: 0
         });
 
         addLog('Processing CSV file...');
@@ -327,6 +331,10 @@ const SSUrlImport: React.FC = () => {
                                 <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-md p-2">
                                     <p className="text-sm text-muted-foreground">Not Found</p>
                                     <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{stats.notFound}</p>
+                                </div>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-md p-2">
+                                    <p className="text-sm text-muted-foreground">Duplicates (Skipped)</p>
+                                    <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{stats.duplicates}</p>
                                 </div>
                             </div>
                         </div>

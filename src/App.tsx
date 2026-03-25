@@ -15,7 +15,8 @@ import UserForm from "./pages/dashboard/UserForm";
 import Settings from "./pages/dashboard/Settings";
 import Orders from "./pages/dashboard/Orders";
 import NotFound from "./pages/NotFound";
-import SSUrlImport from "./pages/dashboard/SSUrlImport";
+import SSUrlImport from "./pages/dashboard/SSUrl/SSUrlImport";
+import SSUrlData from "./pages/dashboard/SSUrl/SSUrlData";
 import Login from "./pages/auth/Login";
 import MongoDBStats from "./pages/dashboard/MongoDBStats";
 import SocialScrapeImport from "./pages/dashboard/SocialScrape/SocialScrapeImport";
@@ -62,6 +63,10 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
 
               <Route path="ss-url-import" element={<SSUrlImport />} />
+              <Route path="ss-url">
+                <Route path="import" element={<SSUrlImport />} />
+                <Route path="data" element={<SSUrlData />} />
+              </Route>
               <Route path="mongodb-stats" element={<MongoDBStats />} />
 
               {/* social scrape */}

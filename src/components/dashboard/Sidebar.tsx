@@ -224,12 +224,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
             />
 
           </SidebarGroup>
-          <SidebarItem
-            to="/dashboard/ss-url-import"
+          <SidebarGroup
             icon={<Upload className="h-5 w-5" />}
-            label="SS-URL Import"
-            onClick={handleItemClick}
-          />
+            label="SS URL"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/ss-url/import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="SS URL Import"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/ss-url/data"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="SS URL Data"
+              onClick={handleItemClick}
+            />
+          </SidebarGroup>
           <SidebarItem
             to="/dashboard/mongodb-stats"
             icon={<Database className="h-5 w-5" />}
