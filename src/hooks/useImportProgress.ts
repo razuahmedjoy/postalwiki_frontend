@@ -7,6 +7,8 @@ interface ProgressData {
     total: number;
     upserted: number;
     modified: number;
+    skipped?: number;
+    skippedSamples?: Array<{ filename: string; reason: string; rowPreview: string }>;
     errors: Array<{ filename: string; error: string }>;
     isComplete: boolean;
 }
@@ -138,6 +140,8 @@ export const useImportProgress = ({
             total: 0,
             upserted: 0,
             modified: 0,
+            skipped: 0,
+            skippedSamples: [],
             errors: [],
             isComplete: false
         });

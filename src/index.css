@@ -99,6 +99,36 @@
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors;
   }
+
+  .modern-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.55);
+    background-clip: content-box;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
   
   .sidebar-item.active {
     @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;

@@ -8,6 +8,8 @@ export const CSV_UPLOAD_PATHS = {
 
     BOTSOL_IMPORTS: '/home/dev/api.socialwiki.co.uk/deploy/imports/botsol/',
 
+    RM_ADDRESS_IMPORTS: '/home/dev/api.socialwiki.co.uk/deploy/imports/address_master/',
+
     IMPORTS_SOCIAL_SCRAPE: '/home/dev/api.socialwiki.co.uk/deploy/imports/social_scrape/',
 };
 

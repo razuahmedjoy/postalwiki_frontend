@@ -9,14 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePaginatedBotsol } from '@/api/bostal';
 
 export function BotsolListTable({ reference }: { reference: React.RefObject<HTMLDivElement> }) {
@@ -79,160 +72,8 @@ export function BotsolListTable({ reference }: { reference: React.RefObject<HTML
         }
     };
 
-    const handlePageJump = (targetPage: number) => {
-        if (targetPage > 1000) {
-            // For very deep pages, switch to cursor pagination
-            setUseCursorPagination(true);
-            setCursor(null);
-            // Note: You can't jump to a specific page with cursor pagination
-            // You'd need to implement a different approach for this
-        } else {
-            setUseCursorPagination(false);
-            setPage(targetPage);
-            setCursor(null);
-        }
-    };
-
-    const renderPaginationInfo = () => {
-        if (!data?.pagination) return null;
-
-        if (useCursorPagination) {
-            const hasNextPage = 'hasNextPage' in data.pagination ? data.pagination.hasNextPage : false;
-            return (
-                <div className="text-sm text-muted-foreground">
-                    Showing {data.data.length} results
-                    {hasNextPage && (
-                        <span> • More results available</span>
-                    )}
-                </div>
-            );
-        } else {
-            // Traditional pagination
-            if ('page' in data.pagination && 'total' in data.pagination && 'totalPages' in data.pagination) {
-                const { page: currentPage, total, totalPages } = data.pagination;
-                return (
-                    <div className="text-sm text-muted-foreground">
-                        Page {currentPage} of {totalPages} • {total} total results
-                    </div>
-                );
-            }
-            return null;
-        }
-    };
-
-    const renderPaginationButtons = () => {
-        if (!data?.pagination) return null;
-
-        if (useCursorPagination) {
-            // Simple next/previous for cursor pagination
-            const hasNextPage = 'hasNextPage' in data.pagination ? data.pagination.hasNextPage : false;
-            return (
-                <>
-                    <PaginationItem>
-                        <PaginationPrevious
-                            onClick={handlePreviousPage}
-                            className="cursor-pointer"
-                        />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <span className="px-4 py-2 text-sm">
-                            Cursor-based pagination
-                        </span>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext
-                            onClick={handleNextPage}
-                            className={`cursor-pointer ${!hasNextPage ? 'opacity-50' : ''}`}
-                        />
-                    </PaginationItem>
-                </>
-            );
-        } else {
-            // Traditional pagination
-            if (!('page' in data.pagination && 'totalPages' in data.pagination)) {
-                return null;
-            }
-
-            const { page: currentPage, totalPages } = data.pagination;
-            const buttons = [];
-            const maxVisiblePages = 5;
-
-            // Always show first page
-            buttons.push(
-                <PaginationItem key="first">
-                    <PaginationLink
-                        onClick={() => handlePageJump(1)}
-                        isActive={currentPage === 1}
-                        className="cursor-pointer"
-                    >
-                        1
-                    </PaginationLink>
-                </PaginationItem>
-            );
-
-            // Calculate start and end of visible pages
-            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-            const endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-
-            // Adjust start page if we're near the end
-            if (endPage === totalPages - 1) {
-                startPage = Math.max(2, endPage - maxVisiblePages + 1);
-            }
-
-            // Add ellipsis after first page if needed
-            if (startPage > 2) {
-                buttons.push(
-                    <PaginationItem key="ellipsis1">
-                        <span className="px-4 py-2">...</span>
-                    </PaginationItem>
-                );
-            }
-
-            // Add middle pages
-            for (let i = startPage; i <= endPage; i++) {
-                buttons.push(
-                    <PaginationItem key={i}>
-                        <PaginationLink
-                            onClick={() => handlePageJump(i)}
-                            isActive={i === currentPage}
-                            className="cursor-pointer"
-                        >
-                            {i}
-                        </PaginationLink>
-                    </PaginationItem>
-                );
-            }
-
-            // Add ellipsis before last page if needed
-            if (endPage < totalPages - 1) {
-                buttons.push(
-                    <PaginationItem key="ellipsis2">
-                        <span className="px-4 py-2">...</span>
-                    </PaginationItem>
-                );
-            }
-
-            // Always show last page if there is more than one page
-            if (totalPages > 1) {
-                buttons.push(
-                    <PaginationItem key="last">
-                        <PaginationLink
-                            onClick={() => handlePageJump(totalPages)}
-                            isActive={currentPage === totalPages}
-                            className="cursor-pointer"
-                        >
-                            {totalPages}
-                        </PaginationLink>
-                    </PaginationItem>
-                );
-            }
-
-            return buttons;
-        }
-    };
-
     return (
-        <div className="container mx-auto py-2">
+        <div className="container mx-auto py-2 min-h-screen pb-24 relative">
             <div className="mb-6 flex justify-between w-full">
                 <h1 className="text-xl font-bold mb-3">Social Media Scrape Data jho</h1>
 
@@ -394,13 +235,44 @@ export function BotsolListTable({ reference }: { reference: React.RefObject<HTML
             </div>
 
             {data?.pagination && (
-                <div className="mt-4">
-                    {renderPaginationInfo()}
-                    <Pagination className="mt-2">
-                        <PaginationContent>
-                            {renderPaginationButtons()}
-                        </PaginationContent>
-                    </Pagination>
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 min-w-[320px] z-50">
+                    <div className="bg-background/80 backdrop-blur-md border border-slate-200 shadow-xl rounded-full p-2 px-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={handlePreviousPage}
+                            disabled={(data.pagination.page ?? 1) <= 1 || isLoading || isFetching}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+
+                        <span className="text-sm font-medium whitespace-nowrap tabular-nums">
+                            Page {(data.pagination.page ?? 1).toLocaleString()}
+                            {'totalPages' in data.pagination ? ` of ${data.pagination.totalPages.toLocaleString()}` : ''}
+                            <span className="ml-2 text-muted-foreground text-xs font-normal">
+                                ({('total' in data.pagination ? (data.pagination.total ?? 0) : data.data.length).toLocaleString()} items)
+                            </span>
+                        </span>
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={handleNextPage}
+                            disabled={
+                                (
+                                    useCursorPagination
+                                        ? !(data.pagination.hasNextPage ?? false)
+                                        : !('totalPages' in data.pagination) || (data.pagination.page ?? 1) >= data.pagination.totalPages
+                                )
+                                || isLoading
+                                || isFetching
+                            }
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             )}
         </div>

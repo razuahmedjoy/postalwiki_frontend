@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload, Database, Building } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutDashboard, Settings, Users, Menu, ShoppingCart, Upload, Database, Building, MapPinned } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -94,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
   return (
     <aside
       className={cn(
-        'bg-sidebar fixed inset-y-0 left-0 z-20 flex w-64 flex-col border-r border-sidebar-border transition-transform duration-300 ease-in-out',
+        'bg-sidebar fixed inset-y-0 left-0 z-20 flex w-64 flex-col border-r border-sidebar-border transition-transform duration-300 ease-in-out overflow-hidden',
         isMobile && !isMobileOpen && '-translate-x-full',
         isMobile && isMobileOpen && 'translate-x-0',
         !isMobile && 'translate-x-0'
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
         )}
       </div>
 
-      <nav className="flex-1 space-y-1 px-2 py-4">
+      <nav className="modern-scrollbar flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-1 px-2 py-4">
         <div className="flex flex-col gap-1">
           {/* <SidebarItem
             to="/dashboard"
@@ -202,6 +202,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               to="/dashboard/postcode-district/search"
               icon={<div className="h-2 w-2 rounded-full bg-current" />}
               label="PostCodeDistrict Search"
+              onClick={handleItemClick}
+            />
+          </SidebarGroup>
+
+          <SidebarGroup
+            icon={<MapPinned className="h-5 w-5" />}
+            label="RM Address"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/rm-address/import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Import"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/rm-address/view"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="View"
               onClick={handleItemClick}
             />
           </SidebarGroup>

@@ -22,15 +22,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Search, Building2, MapPin, Calendar, Hash, Globe, Trash2 } from "lucide-react";
+import { Search, Building2, MapPin, Calendar, Hash, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePaginatedCompanyHouse, useDeleteAllCompanyHouseData } from '@/api/companyHouse';
 import { useToast } from '@/hooks/use-toast';
 
@@ -123,20 +115,6 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
         }
     }, [useCursorPagination]);
 
-    const handlePageJump = useCallback((targetPage: number) => {
-        if (targetPage > 1000) {
-            // For very deep pages, switch to cursor pagination
-            setUseCursorPagination(true);
-            setCursor(null);
-            // Note: You can't jump to a specific page with cursor pagination
-            // You'd need to implement a different approach for this
-        } else {
-            setUseCursorPagination(false);
-            setPage(targetPage);
-            setCursor(null);
-        }
-    }, []);
-
     const handleDeleteAll = useCallback(() => {
         deleteAllMutation.mutate(undefined, {
             onSuccess: (data) => {
@@ -160,125 +138,6 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
             }
         });
     }, [deleteAllMutation, toast]);
-
-    const renderPaginationInfo = () => {
-        if (!data?.pagination) return null;
-
-        if (useCursorPagination) {
-            const hasMore = data.pagination.hasMore;
-            return (
-                <div className="text-sm text-muted-foreground">
-                    Showing {data.data.length} results
-                    {hasMore && (
-                        <span> • More results available</span>
-                    )}
-                </div>
-            );
-        } else {
-            // Traditional pagination - calculate total pages from hasMore and current results
-            const { page: currentPage, total, hasMore } = data.pagination;
-            const totalDisplay = total !== null ? `${total} total results` : 'results';
-            return (
-                <div className="text-sm text-muted-foreground">
-                    Page {currentPage} • {totalDisplay}
-                    {hasMore && (
-                        <span> • More results available</span>
-                    )}
-                </div>
-            );
-        }
-    };
-
-    const renderPaginationButtons = () => {
-        if (!data?.pagination) return null;
-
-        if (useCursorPagination) {
-            // Simple next/previous for cursor pagination
-            const hasMore = data.pagination.hasMore;
-            return (
-                <>
-                    <PaginationItem>
-                        <PaginationPrevious
-                            onClick={handlePreviousPage}
-                            className="cursor-pointer"
-                        />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <span className="px-4 py-2 text-sm">
-                            Cursor-based pagination
-                        </span>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext
-                            onClick={handleNextPage}
-                            className={`cursor-pointer ${!hasMore ? 'opacity-50' : ''}`}
-                        />
-                    </PaginationItem>
-                </>
-            );
-        } else {
-            // Traditional pagination with simplified logic due to different pagination structure
-            const { page: currentPage, hasMore } = data.pagination;
-            const buttons = [];
-            const maxVisiblePages = 5;
-
-            // Previous button
-            if (currentPage > 1) {
-                buttons.push(
-                    <PaginationItem key="prev">
-                        <PaginationPrevious
-                            onClick={handlePreviousPage}
-                            className="cursor-pointer"
-                        />
-                    </PaginationItem>
-                );
-            }
-
-            // Show some page numbers around current page
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = currentPage + 2;
-
-            for (let i = startPage; i <= endPage; i++) {
-                if (i === currentPage) {
-                    buttons.push(
-                        <PaginationItem key={i}>
-                            <PaginationLink
-                                isActive={true}
-                                className="cursor-pointer"
-                            >
-                                {i}
-                            </PaginationLink>
-                        </PaginationItem>
-                    );
-                } else if (i < currentPage || (i > currentPage && hasMore)) {
-                    buttons.push(
-                        <PaginationItem key={i}>
-                            <PaginationLink
-                                onClick={() => handlePageJump(i)}
-                                className="cursor-pointer"
-                            >
-                                {i}
-                            </PaginationLink>
-                        </PaginationItem>
-                    );
-                }
-            }
-
-            // Next button
-            if (hasMore) {
-                buttons.push(
-                    <PaginationItem key="next">
-                        <PaginationNext
-                            onClick={handleNextPage}
-                            className="cursor-pointer"
-                        />
-                    </PaginationItem>
-                );
-            }
-
-            return buttons;
-        }
-    };
 
     // Memoize address formatting function
     const formatAddress = useCallback((regAddress: any) => {
@@ -370,7 +229,7 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
     ), [formatAddress, getStatusBadgeVariant]);
 
     return (
-        <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8 min-h-screen pb-24 relative">
             {/* Header Section */}
             <div className="mb-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -415,9 +274,6 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                        {data?.pagination && renderPaginationInfo()}
                     </div>
                 </div>
 
@@ -594,17 +450,37 @@ export function CompanyHouseTable({ reference }: { reference: React.RefObject<HT
                 </Card>
             )}
 
-            {/* Pagination */}
+            {/* Floating Pagination */}
             {data?.pagination && (
-                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-sm text-muted-foreground order-2 sm:order-1">
-                        {renderPaginationInfo()}
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 min-w-[320px] z-50">
+                    <div className="bg-background/80 backdrop-blur-md border border-slate-200 shadow-xl rounded-full p-2 px-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={handlePreviousPage}
+                            disabled={(data.pagination.page ?? 1) <= 1 || isLoading || isFetching}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+
+                        <span className="text-sm font-medium whitespace-nowrap tabular-nums">
+                            Page {(data.pagination.page ?? 1).toLocaleString()}
+                            <span className="ml-2 text-muted-foreground text-xs font-normal">
+                                ({(data.pagination.total ?? 0).toLocaleString()} items)
+                            </span>
+                        </span>
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={handleNextPage}
+                            disabled={!data.pagination.hasMore || isLoading || isFetching}
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </div>
-                    <Pagination className="order-1 sm:order-2">
-                        <PaginationContent>
-                            {renderPaginationButtons()}
-                        </PaginationContent>
-                    </Pagination>
                 </div>
             )}
         </div>

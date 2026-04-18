@@ -6,6 +6,8 @@ interface ProgressData {
     total: number;
     upserted: number;
     modified: number;
+    skipped?: number;
+    skippedSamples?: Array<{ filename: string; reason: string; rowPreview: string }>;
     errors: Array<{ filename: string; error: string }>;
     isComplete: boolean;
 }
@@ -58,6 +60,7 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
                             </p>
                             <p>Upserted: {progress.upserted}</p>
                             <p>Modified: {progress.modified}</p>
+                            <p>Skipped: {progress.skipped ?? 0}</p>
                             <p>Errors: {progress.errors.length}</p>
                         </div>
                     </div>
@@ -97,6 +100,23 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
                             <div key={index} className="p-2.5 mb-2 bg-red-50 text-red-800 rounded-md">
                                 <p className="font-medium">{error.filename}</p>
                                 <p className="text-sm">{error.error}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {progress.skippedSamples && progress.skippedSamples.length > 0 && (
+                <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-2">Recent Skipped Rows</h3>
+                    <div className="max-h-[240px] overflow-y-auto border border-amber-200 rounded-md p-3">
+                        {progress.skippedSamples.map((item, index) => (
+                            <div key={index} className="p-2.5 mb-2 bg-amber-50 text-amber-900 rounded-md">
+                                <p className="font-medium">{item.filename}</p>
+                                <p className="text-sm">Reason: {item.reason}</p>
+                                {item.rowPreview && (
+                                    <p className="text-xs text-amber-700 font-mono mt-1 break-all">{item.rowPreview}</p>
+                                )}
                             </div>
                         ))}
                     </div>
