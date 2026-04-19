@@ -43,6 +43,15 @@ interface UpdateParams {
     district: string;
 }
 
+export interface CheckPostcodesResult {
+    inputCount: number;
+    normalizedCount: number;
+    uniqueCount: number;
+    foundCount: number;
+    missingCount: number;
+    missingPostcodes: string[];
+}
+
 // --- Import Hooks ---
 
 export const usePostcodeImportStart = () => {
@@ -137,5 +146,18 @@ export const usePostcodeDelete = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['postcode-search'] });
         }
+    });
+};
+
+export const usePostcodeCheck = () => {
+    return useMutation({
+        mutationFn: async (postcodes: string[]) => {
+            const { data } = await axiosInstance.post<{ success: boolean; data: CheckPostcodesResult }>(
+                '/postcode-district/check-postcodes',
+                { postcodes }
+            );
+
+            return data.data;
+        },
     });
 };

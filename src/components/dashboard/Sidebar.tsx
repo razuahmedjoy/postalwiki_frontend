@@ -204,6 +204,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
               label="PostCodeDistrict Search"
               onClick={handleItemClick}
             />
+            <SidebarItem
+              to="/dashboard/postcode-district/check"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Check Postcode"
+              onClick={handleItemClick}
+            />
           </SidebarGroup>
 
           <SidebarGroup

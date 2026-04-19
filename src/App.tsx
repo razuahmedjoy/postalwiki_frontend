@@ -32,6 +32,7 @@ import ImportCH from "./pages/dashboard/CompanyHouse/ImportCH";
 import { CompanyHouseDataPage } from "./pages/dashboard/CompanyHouse/CompanyHouseDataPage";
 import PostcodeImport from "./pages/dashboard/PostcodeDistrict/PostcodeImport";
 import PostcodeSearch from "./pages/dashboard/PostcodeDistrict/PostcodeSearch";
+import CheckPostcode from "./pages/dashboard/PostcodeDistrict/CheckPostcode";
 import RMAddressImport from "./pages/dashboard/RMAddress/RMAddressImport";
 import RMAddressView from "./pages/dashboard/RMAddress/RMAddressView";
 const App = () => (
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="postcode-district">
                 <Route path="import" element={<PostcodeImport />} />
                 <Route path="search" element={<PostcodeSearch />} />
+                <Route path="check" element={<CheckPostcode />} />
               </Route>
 
               <Route path="rm-address">

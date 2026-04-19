@@ -66,7 +66,7 @@ interface PaginatedParams {
 }
 
 interface UploadRMAddressFilesPayload {
-  files: File[];
+  file: File;
   onProgress?: (percent: number) => void;
 }
 
@@ -115,9 +115,9 @@ export const useUploadRMAddressFiles = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ files, onProgress }: UploadRMAddressFilesPayload) => {
+    mutationFn: async ({ file, onProgress }: UploadRMAddressFilesPayload) => {
       const formData = new FormData();
-      files.forEach((file) => formData.append('files', file));
+      formData.append('files', file);
 
       const { data } = await axiosInstance.post('/rm-address/upload-files', formData, {
         headers: {

@@ -17,7 +17,7 @@ const RMAddressImport = () => {
     isLoading: isLoadingImportFiles,
     refetch: refetchImportFiles
   } = useRMAddressImportFiles();
-  const { mutate: uploadFiles, isPending: isUploading } = useUploadRMAddressFiles();
+  const { mutateAsync: uploadSingleFile, isPending: isUploading } = useUploadRMAddressFiles();
 
   const {
     progress,
@@ -60,7 +60,7 @@ const RMAddressImport = () => {
     setSelectedFiles(files);
   };
 
-  const handleUploadFiles = () => {
+  const handleUploadFiles = async () => {
     if (!selectedFiles.length) {
       toast.error('Please select one or more CSV files first.');
       return;
@@ -68,33 +68,47 @@ const RMAddressImport = () => {
 
     setUploadProgress(0);
 
-    uploadFiles(
-      {
-        files: selectedFiles,
-        onProgress: setUploadProgress,
-      },
-      {
-        onSuccess: (response: any) => {
-          const uploadedCount = response?.uploadedFiles?.length || selectedFiles.length;
-          addLog({
-            type: 'success',
-            message: `Uploaded ${uploadedCount} file(s) to RM Address import directory.`
-          });
-          toast.success(`Uploaded ${uploadedCount} file(s) successfully.`);
-          setSelectedFiles([]);
-          setUploadProgress(0);
-          refetchImportFiles();
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+    let uploadedCount = 0;
+
+    for (let index = 0; index < selectedFiles.length; index += 1) {
+      const file = selectedFiles[index];
+
+      try {
+        await uploadSingleFile({
+          file,
+          onProgress: (filePercent) => {
+            const overall = ((index + filePercent / 100) / selectedFiles.length) * 100;
+            setUploadProgress(Math.round(overall));
           }
-        },
-        onError: (error: any) => {
-          const message = error?.response?.data?.message || error?.response?.data?.error || error.message || 'Upload failed';
-          addLog({ type: 'error', message });
-          toast.error(`Upload failed: ${message}`);
-        }
+        });
+
+        uploadedCount += 1;
+        addLog({
+          type: 'success',
+          message: `Uploaded file ${index + 1}/${selectedFiles.length}: ${file.name}`
+        });
+      } catch (error: any) {
+        const message = error?.response?.data?.message || error?.response?.data?.error || error.message || 'Upload failed';
+        addLog({ type: 'error', message: `Failed on ${file.name}: ${message}` });
+        toast.error(`Upload failed on ${file.name}: ${message}`);
+        return;
       }
-    );
+    }
+
+    setUploadProgress(100);
+    addLog({
+      type: 'success',
+      message: `Uploaded ${uploadedCount} file(s) to RM Address import directory.`
+    });
+    toast.success(`Uploaded ${uploadedCount} file(s) successfully.`);
+    setSelectedFiles([]);
+    refetchImportFiles();
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
+    setTimeout(() => setUploadProgress(0), 600);
   };
 
   const handleImport = () => {
@@ -143,6 +157,9 @@ const RMAddressImport = () => {
         <h3 className="text-lg font-semibold mb-3">CSV Upload</h3>
         <p className="text-sm text-muted-foreground mb-3">
           Upload limits: up to <span className="font-semibold text-foreground">50 files</span> per upload, <span className="font-semibold text-foreground">100 MB</span> per file.
+        </p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Files are uploaded one-by-one to reduce large-request failures on production gateways.
         </p>
         <div className="flex flex-col gap-3">
           <input
