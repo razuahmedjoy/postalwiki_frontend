@@ -41,15 +41,15 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
             {progress.currentFile && (
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">{title}</h3>
-                    <div className="p-4 bg-gray-50 rounded-md">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-900/60 rounded-md border border-gray-200 dark:border-gray-700">
                         <p className="font-medium mb-2">Processing: {progress.currentFile}</p>
-                        <div className="h-5 bg-gray-200 rounded-full overflow-hidden mb-2">
+                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
                             <div
                                 className="h-full bg-green-500 transition-all duration-300"
                                 style={{ width: `${(progress.processed / (progress.total || 1)) * 100}%` }}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
                             <p>
                                 Processed: {progress.isComplete ? 'Processing done' : (
                                     <>
@@ -69,9 +69,9 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
 
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Import Logs</h3>
-                <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-md p-3">
+                <div className="max-h-[300px] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-white dark:bg-gray-900/40">
                     {logs.length === 0 ? (
-                        <p className="text-gray-500">No logs available</p>
+                        <p className="text-gray-500 dark:text-gray-300">No logs available</p>
                     ) : (
                         <div className="space-y-2">
                             {logs.map((log, index) => (
@@ -79,8 +79,8 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
                                     key={index} 
                                     className={`p-2 rounded ${
                                         log.type === 'error'
-                                            ? 'bg-red-50 text-red-700'
-                                            : 'bg-green-50 text-green-700'
+                                            ? 'bg-red-50 text-red-700 dark:bg-red-300/20 dark:text-red-200'
+                                            : 'bg-green-50 text-green-700 dark:bg-green-300/20 dark:text-green-200'
                                     }`}
                                 >
                                     {log.message}
@@ -95,9 +95,9 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
             {progress.errors.length > 0 && (
                 <div>
                     <h3 className="text-lg font-semibold mb-2">Errors</h3>
-                    <div className="max-h-[200px] overflow-y-auto border border-red-200 rounded-md p-3">
+                    <div className="max-h-[200px] overflow-y-auto border border-red-200 dark:border-red-400/40 rounded-md p-3 bg-white dark:bg-gray-900/40">
                         {progress.errors.map((error, index) => (
-                            <div key={index} className="p-2.5 mb-2 bg-red-50 text-red-800 rounded-md">
+                            <div key={index} className="p-2.5 mb-2 bg-red-50 text-red-800 dark:bg-red-300/20 dark:text-red-100 rounded-md">
                                 <p className="font-medium">{error.filename}</p>
                                 <p className="text-sm">{error.error}</p>
                             </div>
@@ -109,13 +109,13 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
             {progress.skippedSamples && progress.skippedSamples.length > 0 && (
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-2">Recent Skipped Rows</h3>
-                    <div className="max-h-[240px] overflow-y-auto border border-amber-200 rounded-md p-3">
+                    <div className="max-h-[240px] overflow-y-auto border border-amber-200 dark:border-amber-400/40 rounded-md p-3 bg-white dark:bg-gray-900/40">
                         {progress.skippedSamples.map((item, index) => (
-                            <div key={index} className="p-2.5 mb-2 bg-amber-50 text-amber-900 rounded-md">
+                            <div key={index} className="p-2.5 mb-2 bg-amber-50 text-amber-900 dark:bg-amber-300/20 dark:text-amber-100 rounded-md">
                                 <p className="font-medium">{item.filename}</p>
                                 <p className="text-sm">Reason: {item.reason}</p>
                                 {item.rowPreview && (
-                                    <p className="text-xs text-amber-700 font-mono mt-1 break-all">{item.rowPreview}</p>
+                                    <p className="text-xs text-amber-700 dark:text-amber-200 font-mono mt-1 break-all">{item.rowPreview}</p>
                                 )}
                             </div>
                         ))}

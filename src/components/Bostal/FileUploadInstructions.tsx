@@ -17,13 +17,13 @@ const FileUploadInstructions: React.FC<FileUploadInstructionsProps> = ({
 }) => {
     return (
         <div className="mb-6">
-            <p>
+            <p className="text-gray-700 dark:text-gray-200">
                 Upload CSV files to the server in{' '}
-                <span className="font-bold dark:bg-black p-1 text-sm">
+                <span className="font-bold bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-1 text-sm">
                     {uploadPath}
                 </span>
             </p>
-            <p>{formatDescription}</p>
+            <p className="text-gray-700 dark:text-gray-200 mt-1">{formatDescription}</p>
             
             {formatImage && (
                 <img 
@@ -34,9 +34,9 @@ const FileUploadInstructions: React.FC<FileUploadInstructionsProps> = ({
             )}
             
             {additionalInfo && (
-                <div className="mt-4 rounded-md">
-                    <h3 className="font-semibold text-black mb-2">Additional Information:</h3>
-                    <p className="text-sm text-gray-400">{additionalInfo}</p>
+                <div className="mt-4 rounded-md border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900/40">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Additional Information:</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{additionalInfo}</p>
                 </div>
             )}
         </div>
