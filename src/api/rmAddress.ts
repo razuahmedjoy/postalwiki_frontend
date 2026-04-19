@@ -45,16 +45,21 @@ interface PaginatedResponse {
   success: boolean;
   data: RMAddressRow[];
   pagination: {
-    page: number;
+    mode?: 'cursor' | 'offset';
+    page: number | null;
     limit: number;
-    total: number;
-    totalPages: number;
+    total: number | null;
+    totalPages: number | null;
+    hasNextPage?: boolean;
+    nextCursor?: string | null;
   };
 }
 
 interface PaginatedParams {
   page?: number;
   limit?: number;
+  cursor?: string | null;
+  useCursor?: boolean;
   searchPostcode?: string;
   searchDistrict?: string;
   searchAddress?: string;

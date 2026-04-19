@@ -14,6 +14,8 @@ import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function RMAddressTable({ reference }: { reference: React.RefObject<HTMLDivElement> }) {
   const [page, setPage] = useState(1);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [cursorHistory, setCursorHistory] = useState<Array<string | null>>([]);
   const [searchPostcode, setSearchPostcode] = useState('');
   const [searchDistrict, setSearchDistrict] = useState('');
   const [searchAddress, setSearchAddress] = useState('');
@@ -28,10 +30,12 @@ export function RMAddressTable({ reference }: { reference: React.RefObject<HTMLD
   const queryParams = useMemo(() => ({
     page,
     limit,
+    cursor,
+    useCursor: true,
     searchPostcode: searchQuery.postcode || undefined,
     searchDistrict: searchQuery.district || undefined,
     searchAddress: searchQuery.address || undefined,
-  }), [page, limit, searchQuery]);
+  }), [page, limit, cursor, searchQuery]);
 
   const { data, isLoading, isFetching } = usePaginatedRMAddress(queryParams);
 
@@ -52,10 +56,29 @@ export function RMAddressTable({ reference }: { reference: React.RefObject<HTMLD
       address: searchAddress
     });
     setPage(1);
+    setCursor(null);
+    setCursorHistory([]);
   };
 
-  const totalPages = data?.pagination?.totalPages || 1;
-  const currentPage = data?.pagination?.page || page;
+  const hasNextPage = Boolean(data?.pagination?.hasNextPage);
+  const nextCursor = data?.pagination?.nextCursor || null;
+  const totalItems = data?.pagination?.total;
+
+  const handleNextPage = () => {
+    if (!hasNextPage || !nextCursor || isLoading || isFetching) return;
+    setCursorHistory((prev) => [...prev, cursor]);
+    setCursor(nextCursor);
+    setPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (cursorHistory.length === 0 || isLoading || isFetching) return;
+
+    const previousCursor = cursorHistory[cursorHistory.length - 1] ?? null;
+    setCursor(previousCursor);
+    setCursorHistory((prev) => prev.slice(0, -1));
+    setPage((prev) => Math.max(1, prev - 1));
+  };
 
   return (
     <div className="container mx-auto py-4 min-h-screen pb-24 relative">
@@ -134,25 +157,31 @@ export function RMAddressTable({ reference }: { reference: React.RefObject<HTMLD
             variant="ghost"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={currentPage <= 1 || isLoading || isFetching}
+            onClick={handlePreviousPage}
+            disabled={page <= 1 || cursorHistory.length === 0 || isLoading || isFetching}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
           <span className="text-sm font-medium whitespace-nowrap tabular-nums">
-            Page {currentPage.toLocaleString()} of {totalPages.toLocaleString()}
-            <span className="ml-2 text-muted-foreground text-xs font-normal">
-              ({data?.pagination?.total?.toLocaleString() || 0} items)
-            </span>
+            Page {page.toLocaleString()}
+            {typeof totalItems === 'number' && totalItems >= 0 ? (
+              <span className="ml-2 text-muted-foreground text-xs font-normal">
+                ({totalItems.toLocaleString()} items)
+              </span>
+            ) : (
+              <span className="ml-2 text-muted-foreground text-xs font-normal">
+                (cursor mode)
+              </span>
+            )}
           </span>
 
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            disabled={currentPage >= totalPages || isLoading || isFetching}
+            onClick={handleNextPage}
+            disabled={!hasNextPage || !nextCursor || isLoading || isFetching}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
