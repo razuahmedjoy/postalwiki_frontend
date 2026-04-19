@@ -232,6 +232,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
           </SidebarGroup>
 
           <SidebarGroup
+            icon={<Database className="h-5 w-5" />}
+            label="Prop Price"
+            defaultOpen
+          >
+            <SidebarItem
+              to="/dashboard/prop-price/import"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Import New"
+              onClick={handleItemClick}
+            />
+            <SidebarItem
+              to="/dashboard/prop-price/view"
+              icon={<div className="h-2 w-2 rounded-full bg-current" />}
+              label="Display"
+              onClick={handleItemClick}
+            />
+          </SidebarGroup>
+
+          <SidebarGroup
             label="Bostal DataBase"
             defaultOpen
           >

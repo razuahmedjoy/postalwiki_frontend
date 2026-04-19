@@ -10,6 +10,8 @@ export const CSV_UPLOAD_PATHS = {
 
     RM_ADDRESS_IMPORTS: '/home/dev/api.socialwiki.co.uk/deploy/imports/address_master/',
 
+    PROP_PRICE_IMPORTS: '/home/dev/api.socialwiki.co.uk/deploy/imports/prop_price/',
+
     IMPORTS_SOCIAL_SCRAPE: '/home/dev/api.socialwiki.co.uk/deploy/imports/social_scrape/',
 };
 

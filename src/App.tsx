@@ -35,6 +35,8 @@ import PostcodeSearch from "./pages/dashboard/PostcodeDistrict/PostcodeSearch";
 import CheckPostcode from "./pages/dashboard/PostcodeDistrict/CheckPostcode";
 import RMAddressImport from "./pages/dashboard/RMAddress/RMAddressImport";
 import RMAddressView from "./pages/dashboard/RMAddress/RMAddressView";
+import PropPriceImport from "./pages/dashboard/PropPrice/PropPriceImport";
+import PropPriceView from "./pages/dashboard/PropPrice/PropPriceView";
 const App = () => (
   <QueryProvider>
     <ThemeProvider>
@@ -92,6 +94,11 @@ const App = () => (
               <Route path="rm-address">
                 <Route path="import" element={<RMAddressImport />} />
                 <Route path="view" element={<RMAddressView />} />
+              </Route>
+
+              <Route path="prop-price">
+                <Route path="import" element={<PropPriceImport />} />
+                <Route path="view" element={<PropPriceView />} />
               </Route>
 
               <Route path="botsol">
