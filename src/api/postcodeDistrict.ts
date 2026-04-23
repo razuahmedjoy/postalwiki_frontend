@@ -9,11 +9,23 @@ export interface PostcodeDistrict {
 
 interface ImportJobStatus {
     _id: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed';
+    jobType?: 'import' | 'check';
+    status: 'pending' | 'processing' | 'completed' | 'stopped' | 'failed';
+    stage?: string;
+    inputFileName?: string;
     totalProcessed: number;
+    inputCount?: number;
+    uniqueCount?: number;
+    foundCount?: number;
+    missingCount?: number;
     insertedCount: number;
     errorCount: number;
+    stopRequested?: boolean;
+    resultFileName?: string;
+    resultFilePath?: string;
+    sampleMissingPostcodes?: string[];
     errorLogs: string[];
+    completedAt?: string | null;
     createdAt: string;
 }
 
@@ -50,6 +62,10 @@ export interface CheckPostcodesResult {
     foundCount: number;
     missingCount: number;
     missingPostcodes: string[];
+}
+
+export interface PostcodeCheckJobStatus extends ImportJobStatus {
+    sampleMissingPostcodes: string[];
 }
 
 // --- Import Hooks ---
@@ -160,4 +176,68 @@ export const usePostcodeCheck = () => {
             return data.data;
         },
     });
+};
+
+export const usePostcodeCheckJobStart = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const { data } = await axiosInstance.post<{ success: boolean; jobId: string }>('/postcode-district/check/start');
+            return data;
+        },
+    });
+};
+
+export const useUploadPostcodeCheckFile = () => {
+    return useMutation({
+        mutationFn: async ({ jobId, file, onUploadProgress }: { jobId: string; file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const { data } = await axiosInstance.post(`/postcode-district/check/upload/${jobId}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onUploadProgress,
+                timeout: 0,
+            });
+
+            return data;
+        },
+    });
+};
+
+export const usePostcodeCheckJobStatus = (jobId: string | null) => {
+    return useQuery({
+        queryKey: ['postcode-check-job-status', jobId],
+        queryFn: async () => {
+            if (!jobId) return null;
+            const { data } = await axiosInstance.get<{ success: boolean; data: PostcodeCheckJobStatus }>(`/postcode-district/check/status/${jobId}`);
+            return data.data;
+        },
+        enabled: !!jobId,
+        refetchInterval: (query) => {
+            const status = query.state.data?.status;
+            if (status === 'completed' || status === 'failed' || status === 'stopped') return false;
+            return 2000;
+        },
+    });
+};
+
+export const useStopPostcodeCheckJob = () => {
+    return useMutation({
+        mutationFn: async (jobId: string) => {
+            const { data } = await axiosInstance.post(`/postcode-district/check/stop/${jobId}`);
+            return data;
+        },
+    });
+};
+
+export const downloadPostcodeCheckResult = async (jobId: string) => {
+    const { data, headers } = await axiosInstance.get(`/postcode-district/check/download/${jobId}`, {
+        responseType: 'blob',
+    });
+
+    const filenameHeader = headers['content-disposition'] || headers['Content-Disposition'] || '';
+    const match = /filename="?([^";]+)"?/i.exec(filenameHeader);
+    const fileName = match?.[1] || `postcode-check-result-${jobId}.csv`;
+
+    return { blob: data as Blob, fileName };
 };

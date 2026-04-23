@@ -23,6 +23,16 @@ interface UseImportProgressOptions {
     pollingInterval?: number;
 }
 
+const MAX_LOG_ENTRIES = 50;
+
+const appendLog = (prev: LogEntry[], next: LogEntry) => {
+    const updated = [...prev, next];
+    if (updated.length > MAX_LOG_ENTRIES) {
+        return updated.slice(updated.length - MAX_LOG_ENTRIES);
+    }
+    return updated;
+};
+
 export const useImportProgress = ({ 
     progressEndpoint, 
     pollingInterval = 2000 
@@ -62,10 +72,10 @@ export const useImportProgress = ({
                         const lastLog = prev[prev.length - 1];
                         const newMessage = `Processing ${newProgress.currentFile}: ${newProgress.processed} records`;
                         if (!lastLog || lastLog.message !== newMessage) {
-                            return [...prev, {
+                            return appendLog(prev, {
                                 type: 'success',
                                 message: newMessage
-                            }];
+                            });
                         }
                         return prev;
                     });
@@ -78,10 +88,10 @@ export const useImportProgress = ({
                             const lastLog = prev[prev.length - 1];
                             const newMessage = `Error in ${error.filename}: ${error.error}`;
                             if (!lastLog || lastLog.message !== newMessage) {
-                                return [...prev, {
+                                return appendLog(prev, {
                                     type: 'error',
                                     message: newMessage
-                                }];
+                                });
                             }
                             return prev;
                         });
@@ -95,10 +105,10 @@ export const useImportProgress = ({
                         clearInterval(intervalRef.current);
                         intervalRef.current = undefined;
                     }
-                    setLogs(prev => [...prev, {
+                    setLogs(prev => appendLog(prev, {
                         type: 'success',
                         message: 'Import completed successfully'
-                    }]);
+                    }));
                 }
             }
         } catch (error) {
@@ -108,19 +118,19 @@ export const useImportProgress = ({
                 clearInterval(intervalRef.current);
                 intervalRef.current = undefined;
             }
-            setLogs(prev => [...prev, {
+            setLogs(prev => appendLog(prev, {
                 type: 'error',
                 message: 'Error fetching progress'
-            }]);
+            }));
         }
     };
 
     const startPolling = () => {
         setIsPolling(true);
-        setLogs(prev => [...prev, {
+        setLogs(prev => appendLog(prev, {
             type: 'success',
             message: 'Starting import process...'
-        }]);
+        }));
         
         // Clear any existing polling
         if (intervalRef.current) {
@@ -149,7 +159,7 @@ export const useImportProgress = ({
     };
 
     const addLog = (log: LogEntry) => {
-        setLogs(prev => [...prev, log]);
+        setLogs(prev => appendLog(prev, log));
     };
 
     return {

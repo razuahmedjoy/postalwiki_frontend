@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
 interface ProgressData {
     currentFile: string | null;
@@ -28,13 +28,7 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
     logs, 
     title = "Import Progress" 
 }) => {
-    const logsEndRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (logsEndRef.current) {
-            logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [logs]);
+    const visibleLogs = logs.slice(-25);
 
     return (
         <>
@@ -69,25 +63,25 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
 
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Import Logs</h3>
-                <div className="max-h-[300px] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-white dark:bg-gray-900/40">
-                    {logs.length === 0 ? (
-                        <p className="text-gray-500 dark:text-gray-300">No logs available</p>
+                <div className="max-h-[220px] overflow-y-auto border border-gray-300 dark:border-gray-700 rounded p-2 text-sm font-mono bg-white dark:bg-gray-950">
+                    {visibleLogs.length === 0 ? (
+                        <p className="text-gray-500 dark:text-gray-300">No logs yet</p>
                     ) : (
-                        <div className="space-y-2">
-                            {logs.map((log, index) => (
-                                <div 
-                                    key={index} 
-                                    className={`p-2 rounded ${
-                                        log.type === 'error'
-                                            ? 'bg-red-50 text-red-700 dark:bg-red-300/20 dark:text-red-200'
-                                            : 'bg-green-50 text-green-700 dark:bg-green-300/20 dark:text-green-200'
-                                    }`}
+                        <div className="space-y-1">
+                            {visibleLogs.map((log, index) => (
+                                <div
+                                    key={`${index}-${log.message}`}
+                                    className={log.type === 'error' ? 'text-red-600 dark:text-red-300' : 'text-gray-700 dark:text-gray-200'}
                                 >
-                                    {log.message}
+                                    {log.type === 'error' ? 'ERR' : 'LOG'}: {log.message}
                                 </div>
                             ))}
-                            <div ref={logsEndRef} />
                         </div>
+                    )}
+                    {logs.length > visibleLogs.length && (
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            Showing latest {visibleLogs.length} log entries.
+                        </p>
                     )}
                 </div>
             </div>
